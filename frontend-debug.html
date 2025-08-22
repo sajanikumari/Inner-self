@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Debug - Inner-self</title>
+</head>
+<body>
+    <h1>Inner-self Frontend Debug</h1>
+    <button onclick="testBackendConnection()">Test Backend Connection</button>
+    <button onclick="testLogin()">Test Login</button>
+    <div id="result"></div>
+
+    <script>
+        // Import config
+        const API_CONFIG = {
+            BASE_URL: (() => {
+                if (window.location.hostname.includes('github.io')) {
+                    return 'https://inner-self-backend.onrender.com/api';
+                }
+                return 'http://localhost:5000/api';
+            })()
+        };
+
+        async function testBackendConnection() {
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>Testing backend connection...</p>';
+            
+            try {
+                const response = await fetch('https://inner-self-backend.onrender.com/', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.text();
+                result.innerHTML = `
+                    <h3>Backend Connection: ✅ SUCCESS</h3>
+                    <p>Status: ${response.status}</p>
+                    <p>Response: ${data}</p>
+                    <p>Backend URL: ${API_CONFIG.BASE_URL}</p>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <h3>Backend Connection: ❌ ERROR</h3>
+                    <p>Error: ${error.message}</p>
+                    <p>Backend URL: ${API_CONFIG.BASE_URL}</p>
+                `;
+            }
+        }
+
+        async function testLogin() {
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>Testing login endpoint...</p>';
+            
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'test123'
+                    })
+                });
+                
+                const data = await response.json();
+                result.innerHTML = `
+                    <h3>Login Test: ✅ SUCCESS</h3>
+                    <p>Status: ${response.status}</p>
+                    <p>Response: ${JSON.stringify(data, null, 2)}</p>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <h3>Login Test: ❌ ERROR</h3>
+                    <p>Error: ${error.message}</p>
+                    <p>This indicates a network/CORS issue</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

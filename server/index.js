@@ -13,7 +13,9 @@ app.use(cors({
     'http://localhost:3000',
     'http://localhost:5000', 
     'http://127.0.0.1:5500',
-    'https://sajanikumari.github.io'
+    'https://sajanikumari.github.io',
+    'https://sajanikumari.github.io/Inner-self',
+    'https://sajanikumari.github.io/Inner-self/client'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
