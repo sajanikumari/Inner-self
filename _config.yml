@@ -1,0 +1,21 @@
+﻿name: Inner-self
+theme: jekyll-theme-primer
+exclude:
+  - server/
+  - server/**
+  - node_modules/
+  - **/node_modules/**
+  - scripts/
+  - .github/
+  - .git/
+  - .idea/
+  - .vscode/
+  - package.json
+  - package-lock.json
+  - yarn.lock
+  - pnpm-lock.yaml
+  - LICENSE
+  - Dockerfile
+  - docker-compose.yml
+include:
+  - client/
