@@ -10,12 +10,7 @@ const API_CONFIG = {
         console.log('  Protocol:', protocol);
         console.log('  Full URL:', window.location.href);
         
-        // TEMPORARY: Force production backend for testing
-        // TODO: Remove this override once testing is complete
-        if (true) { // Re-enable production mode after backend fix
-            console.log('🔧 FORCING production backend for testing');
-            return 'https://inner-self-backend.onrender.com/api';
-        }
+        // Production mode is now stable - using live backend
         
         // Check if we're on GitHub Pages or production
         if (hostname.includes('github.io') || 
