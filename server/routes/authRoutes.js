@@ -98,12 +98,15 @@ router.post('/signup', async (req, res) => {
         console.log(`📧 Email: ${email}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
 
         // Validation
+        console.log('🔍 Validating signup fields...');
         if (!name || !username || !email || !password) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'All fields are required' 
+            console.log('❌ Missing required fields:', { name: !!name, username: !!username, email: !!email, password: !!password });
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required'
             });
         }
+        console.log('✅ Signup validation passed');
 
         if (password.length < 6) {
             return res.status(400).json({ 
