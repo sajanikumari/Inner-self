@@ -6,20 +6,22 @@ const auth = async (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
     if (!token) {
-      return res.status(401).json({ message: 'No token, authorization denied' });
+      return res.status(401).json({ success: false, message: 'No token, authorization denied' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev_secret_change_me');
-    const user = await User.findById(decoded.id).select('-password');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const user = await User.findById(decoded.userId).select('-password');
     
     if (!user) {
-      return res.status(401).json({ message: 'Token is not valid' });
+      return res.status(401).json({ success: false, message: 'Token is not valid' });
     }
 
     req.user = user;
+    req.userId = user._id; // Add userId for consistency with routes
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Token is not valid' });
+    console.error('❌ Auth middleware error:', error);
+    res.status(401).json({ success: false, message: 'Token is not valid' });
   }
 };
 

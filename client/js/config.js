@@ -12,7 +12,7 @@ const API_CONFIG = {
         
         // TEMPORARY: Force production backend for testing
         // TODO: Remove this override once testing is complete
-        if (true) { // Force production mode
+        if (false) { // Disable forced production mode
             console.log('🔧 FORCING production backend for testing');
             return 'https://inner-self-backend.onrender.com/api';
         }
