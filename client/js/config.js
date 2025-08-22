@@ -1,7 +1,15 @@
 // API Configuration
 const API_CONFIG = {
-    // Use localhost:5000 for development
-    BASE_URL: 'http://localhost:5000/api',
+    // Detect environment and use appropriate backend URL
+    BASE_URL: (() => {
+        // Check if we're on GitHub Pages
+        if (window.location.hostname.includes('github.io')) {
+            // Production backend URL - UPDATE THIS after deploying backend
+            return 'https://your-backend-app.onrender.com/api';
+        }
+        // Development - local backend
+        return 'http://localhost:5000/api';
+    })(),
     
     // Endpoints
     ENDPOINTS: {

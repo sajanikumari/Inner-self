@@ -9,7 +9,12 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: true, // Allow all origins for development
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5000', 
+    'http://127.0.0.1:5500',
+    'https://sajanikumari.github.io'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true

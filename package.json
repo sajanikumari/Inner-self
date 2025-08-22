@@ -1,0 +1,23 @@
+{
+  "name": "inner-self",
+  "version": "1.0.0",
+  "description": "InnerSelf - Personal wellness and diary app",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "cd server && npm install && node index.js",
+    "build": "cd server && npm install",
+    "dev": "cd server && npm run dev",
+    "postinstall": "cd server && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sajanikumari/Inner-self.git"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": ["wellness", "diary", "personal", "health"],
+  "author": "sajanikumari",
+  "license": "MIT"
+}
