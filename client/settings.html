@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InnerSelf Buddy - Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f9d2cc, #f5cac3);
+            min-height: 100vh;
+            color: #5D2906;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255, 182, 193, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #ffb6c1;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #8b4513;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #8b4513;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #8b4513;
+            font-weight: 500;
+            font-size: 18px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255, 182, 193, 0.3);
+        }
+
+        .nav-links a::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: #ff69b4;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after, .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Settings Container */
+        .settings-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 2px solid #ffd1dc;
+        }
+
+        .settings-container h2 {
+            color: #8B4513;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .settings-container h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, #ffb6c1, #ff69b4);
+            border-radius: 2px;
+        }
+
+        /* Setting Cards */
+        .setting-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 5px solid #ffb6c1;
+        }
+
+        .setting-card h3 {
+            color: #8B4513;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+        }
+
+        .setting-card h3 i {
+            width: 40px;
+            height: 40px;
+            background: #ffb6c1;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #8b4513;
+            font-size: 20px;
+        }
+
+        /* Form Elements */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #5D2906;
+            font-size: 18px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #ffb6c1;
+            border-radius: 15px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.7);
+            color: #5D2906;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #8B4513;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 28px;
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+        }
+
+        .btn:hover {
+            background: #5D2906;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 69, 19, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #5D2906;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        /* Danger Zone */
+        .danger-zone {
+            border-left: 5px solid #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .danger-zone h3 {
+            color: #e74c3c;
+        }
+
+        .danger-zone .input-group input {
+            border-color: #e74c3c;
+        }
+
+        .danger-zone .btn {
+            width: 100%;
+        }
+
+        /* Avatar Section */
+        .avatar-section {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .avatar-display {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #ffb6c1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #8B4513;
+            overflow: hidden;
+            border: 5px solid #ffb6c1;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .avatar-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .avatar-option {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #ffb6c1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #8B4513;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .avatar-option:hover, .avatar-option.selected {
+            transform: scale(1.1);
+            border-color: #8B4513;
+        }
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            padding: 20px;
+            color: #8B4513;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.8);
+            width: 100%;
+            position: relative;
+            margin-top: 40px;
+            border-top: 2px solid rgba(255, 182, 193, 0.4);
+        }
+
+        /* Responsive design */
+        @media (max-width: 850px) {
+            .settings-container {
+                margin: 30px 20px;
+                padding: 25px;
+            }
+
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .nav-links a {
+                font-size: 16px;
+                padding: 6px 10px;
+            }
+
+            .avatar-section {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .settings-container {
+                margin: 20px 15px;
+                padding: 20px;
+            }
+
+            .avatar-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                gap: 10px;
+            }
+
+            .nav-links a {
+                font-size: 14px;
+                padding: 5px 8px;
+            }
+
+            .logo-text {
+                font-size: 20px;
+            }
+
+            .settings-container h2 {
+                font-size: 26px;
+            }
+
+            .avatar-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 15px;
+            background: #8B4513;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+    <style>
+        /* Micro-interactions (non-invasive) */
+        .btn { position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        .btn:active { transform: translateY(0) scale(0.98); }
+        .nav-links a i, .btn i { transition: transform 0.2s ease; }
+        .nav-links a:hover i { transform: translateY(-1px); }
+        .input-group input:focus { box-shadow: 0 0 0 3px rgba(255,182,193,0.35); }
+        .ripple { position: absolute; border-radius: 999px; transform: translate(-50%,-50%) scale(0); background: rgba(255,255,255,0.5);
+            pointer-events: none; animation: ripple 600ms ease-out forwards; }
+        @keyframes ripple { from { opacity:.7; transform: translate(-50%,-50%) scale(0);} to { opacity:0; transform: translate(-50%,-50%) scale(4);} }
+        @media (prefers-reduced-motion: reduce) { * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; } }
+    </style>
+
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">🧸</div>
+            <div class="logo-text">Buddy</div>
+        </div>
+        <div class="nav-links">
+            <a href="index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="diary.html"><i class="fas fa-book"></i> Diary</a>
+            <a href="reminders.html"><i class="fas fa-bell"></i> Reminders</a>
+            <a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a>
+            <a href="settings.html" class="active"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+
+    <!-- Settings Container -->
+    <div class="settings-container">
+        <h2>
+            <i class="fas fa-cog"></i> Account Settings
+        </h2>
+
+        <!-- Profile Settings -->
+        <div class="setting-card">
+            <h3><i class="fas fa-user"></i> Profile Information</h3>
+
+            <div class="avatar-section">
+                <div class="avatar-display" id="avatar-display">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h4>Change Your Avatar</h4>
+                    <div class="avatar-options">
+                        <div class="avatar-option" data-icon="fas fa-user">👤</div>
+                        <div class="avatar-option" data-icon="fas fa-smile">😊</div>
+                        <div class="avatar-option selected" data-icon="fas fa-bear">🧸</div>
+                        <div class="avatar-option" data-icon="fas fa-cat">🐱</div>
+                        <div class="avatar-option" data-icon="fas fa-dog">🐶</div>
+                        <div class="avatar-option" data-icon="fas fa-heart">❤️</div>
+                        <div class="avatar-option" data-icon="fas fa-star">⭐</div>
+                        <div class="avatar-option" data-icon="fas fa-moon">🌙</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" placeholder="Enter your name">
+            </div>
+
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Your username" readonly style="background: #f5f5f5; cursor: not-allowed;">
+            </div>
+
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email">
+            </div>
+
+            <div class="input-group">
+                <label for="bio">Bio</label>
+                <textarea id="bio" class="input-group input" placeholder="Tell us about yourself..." style="width: 100%; height: 100px; padding: 14px 18px; border: 2px solid #ffb6c1; border-radius: 15px; font-size: 16px; background: rgba(255, 255, 255, 0.7); color: #5D2906; resize: vertical;"></textarea>
+            </div>
+
+            <button class="btn" id="save-profile-btn">
+                <i class="fas fa-save"></i> Save Profile Changes
+            </button>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="setting-card">
+            <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
+
+            <div class="input-group">
+                <label for="current-password">Current Password</label>
+                <input type="password" id="current-password" placeholder="Enter your current password">
+            </div>
+
+            <div class="input-group">
+                <label for="new-password">New Password</label>
+                <input type="password" id="new-password" placeholder="Enter your new password">
+            </div>
+
+            <div class="input-group">
+                <label for="confirm-password">Confirm New Password</label>
+                <input type="password" id="confirm-password" placeholder="Confirm your new password">
+            </div>
+
+            <div class="input-group" style="margin-top: 30px;">
+                <label>Two-Factor Authentication</label>
+                <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                    <label class="switch">
+                        <input type="checkbox" id="two-factor-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <span>Enable two-factor authentication for extra security</span>
+                </div>
+            </div>
+
+            <button class="btn" id="save-password-btn">
+                <i class="fas fa-lock"></i> Update Security Settings
+            </button>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="setting-card">
+            <h3><i class="fas fa-bell"></i> Notification Preferences</h3>
+
+            <div class="input-group">
+                <label>Email Notifications</label>
+                <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                    <label class="switch">
+                        <input type="checkbox" id="email-notifications" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <span>Receive email notifications</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Push Notifications</label>
+                <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                    <label class="switch">
+                        <input type="checkbox" id="push-notifications" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <span>Receive push notifications</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Reminder Alerts</label>
+                <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                    <label class="switch">
+                        <input type="checkbox" id="reminder-alerts" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <span>Receive reminder alerts</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Diary Insights</label>
+                <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                    <label class="switch">
+                        <input type="checkbox" id="diary-insights" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <span>Receive weekly diary insights</span>
+                </div>
+            </div>
+
+            <button class="btn" id="save-notifications-btn">
+                <i class="fas fa-bell"></i> Save Notification Settings
+            </button>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="setting-card danger-zone">
+            <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+
+            <div class="input-group">
+                <p style="margin-bottom: 20px; line-height: 1.6;">
+                    <strong>Warning:</strong> These actions are irreversible. Please proceed with caution.
+                </p>
+            </div>
+
+            <div class="input-group">
+                <label for="delete-confirm">Type "DELETE" to confirm</label>
+                <input type="text" id="delete-confirm" placeholder="Type DELETE to confirm">
+            </div>
+
+            <button class="btn btn-danger" id="delete-account-btn">
+                <i class="fas fa-trash-alt"></i> Permanently Delete Account
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        Made with LOVE | by SAJANI KUMARI 💞🫶🏻
+    </footer>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        Settings updated successfully!
+    </div>
+
+    <script>
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            if (!token || !user) {
+                alert('Please login to access settings.');
+                window.location.href = 'index.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Check authentication on page load
+        if (!checkAuthentication()) {
+            // Page will redirect, stop execution
+        } else {
+            // DOM Elements
+            const avatarDisplay = document.getElementById('avatar-display');
+            const avatarOptions = document.querySelectorAll('.avatar-option');
+            const saveProfileBtn = document.getElementById('save-profile-btn');
+            const savePasswordBtn = document.getElementById('save-password-btn');
+            const saveNotificationsBtn = document.getElementById('save-notifications-btn');
+            const deleteAccountBtn = document.getElementById('delete-account-btn');
+            const notification = document.getElementById('notification');
+
+            // Current user data
+            let currentUser = null;
+            let selectedAvatar = '🧸';
+
+            // Load user profile data
+            async function loadUserProfile() {
+                try {
+                    // Get user from localStorage first
+                    const userData = localStorage.getItem('user');
+                    if (userData) {
+                        currentUser = JSON.parse(userData);
+                        console.log('👤 Loading profile for user:', currentUser.name);
+
+                        // Populate form with current user data
+                        document.getElementById('name').value = currentUser.name || '';
+                        document.getElementById('username').value = currentUser.username || '';
+                        document.getElementById('email').value = currentUser.email || '';
+                        document.getElementById('bio').value = currentUser.bio || '';
+
+                        // Set avatar if available
+                        if (currentUser.avatar) {
+                            selectedAvatar = currentUser.avatar;
+                            avatarDisplay.textContent = selectedAvatar;
+
+                            // Update selected avatar option
+                            avatarOptions.forEach(option => {
+                                option.classList.remove('selected');
+                                if (option.textContent === selectedAvatar) {
+                                    option.classList.add('selected');
+                                }
+                            });
+                        }
+
+                        // Try to get fresh data from backend
+                        await loadUserFromBackend();
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading user profile:', error);
+                    showNotification('Error loading profile data', 'error');
+                }
+            }
+
+            // Load user data from backend
+            async function loadUserFromBackend() {
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('http://localhost:5000/api/auth/me', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const backendUser = await response.json();
+                        console.log('✅ Loaded fresh user data from backend');
+
+                        // Update localStorage with fresh data
+                        localStorage.setItem('user', JSON.stringify(backendUser));
+                        currentUser = backendUser;
+
+                        // Update form with backend data
+                        document.getElementById('name').value = backendUser.name || '';
+                        document.getElementById('username').value = backendUser.username || '';
+                        document.getElementById('email').value = backendUser.email || '';
+                        document.getElementById('bio').value = backendUser.bio || '';
+
+                        if (backendUser.avatar) {
+                            selectedAvatar = backendUser.avatar;
+                            avatarDisplay.textContent = selectedAvatar;
+                        }
+                    } else {
+                        console.warn('⚠️ Could not load fresh user data from backend');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Backend not available, using cached data:', error.message);
+                }
+            }
+
+            // Save profile to backend
+            async function saveProfileToBackend(profileData) {
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('http://localhost:5000/api/auth/profile', {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(profileData)
+                    });
+
+                    if (response.ok) {
+                        const updatedUser = await response.json();
+                        console.log('✅ Profile updated in backend');
+
+                        // Update localStorage
+                        localStorage.setItem('user', JSON.stringify(updatedUser));
+                        currentUser = updatedUser;
+
+                        return updatedUser;
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.message || 'Failed to update profile');
+                    }
+                } catch (error) {
+                    console.error('❌ Failed to save profile to backend:', error);
+                    throw error;
+                }
+            }
+
+        // Avatar selection
+        avatarOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all options
+                avatarOptions.forEach(opt => opt.classList.remove('selected'));
+
+                // Add selected class to clicked option
+                this.classList.add('selected');
+
+                // Update avatar display
+                selectedAvatar = this.textContent;
+                avatarDisplay.textContent = selectedAvatar;
+            });
+        });
+
+        // Save profile
+        saveProfileBtn.addEventListener('click', async function() {
+            try {
+                // Get form data
+                const profileData = {
+                    name: document.getElementById('name').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    bio: document.getElementById('bio').value.trim(),
+                    avatar: selectedAvatar
+                };
+
+                // Validate required fields
+                if (!profileData.name) {
+                    showNotification('Name is required', 'error');
+                    return;
+                }
+
+                if (!profileData.email) {
+                    showNotification('Email is required', 'error');
+                    return;
+                }
+
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(profileData.email)) {
+                    showNotification('Please enter a valid email address', 'error');
+                    return;
+                }
+
+                // Show loading state
+                saveProfileBtn.disabled = true;
+                saveProfileBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                // Save to backend
+                await saveProfileToBackend(profileData);
+
+                showNotification('Profile updated successfully!', 'success');
+
+                // Update navigation display if name changed
+                const userInfoElement = document.querySelector('.user-info h3');
+                if (userInfoElement) {
+                    userInfoElement.textContent = `Hello, ${profileData.name}!`;
+                }
+
+            } catch (error) {
+                console.error('❌ Error saving profile:', error);
+                showNotification(error.message || 'Failed to save profile', 'error');
+            } finally {
+                // Restore button state
+                saveProfileBtn.disabled = false;
+                saveProfileBtn.innerHTML = '<i class="fas fa-save"></i> Save Profile Changes';
+            }
+        });
+
+        // Save password
+        savePasswordBtn.addEventListener('click', async function() {
+            try {
+                const currentPass = document.getElementById('current-password').value;
+                const newPass = document.getElementById('new-password').value;
+                const confirmPass = document.getElementById('confirm-password').value;
+
+                if (!currentPass || !newPass || !confirmPass) {
+                    showNotification('Please fill in all password fields', true);
+                    return;
+                }
+
+                if (newPass !== confirmPass) {
+                    showNotification('New passwords do not match', true);
+                    return;
+                }
+
+                if (newPass.length < 6) {
+                    showNotification('Password must be at least 6 characters', true);
+                    return;
+                }
+
+                // Show loading state
+                savePasswordBtn.disabled = true;
+                savePasswordBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+                // Update password via backend
+                const token = localStorage.getItem('token');
+                const response = await fetch('http://localhost:5000/api/auth/change-password', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        currentPassword: currentPass,
+                        newPassword: newPass
+                    })
+                });
+
+                if (response.ok) {
+                    showNotification('Password updated successfully!');
+
+                    // Clear password fields
+                    document.getElementById('current-password').value = '';
+                    document.getElementById('new-password').value = '';
+                    document.getElementById('confirm-password').value = '';
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to update password');
+                }
+
+            } catch (error) {
+                console.error('❌ Error updating password:', error);
+                showNotification(error.message || 'Failed to update password', true);
+            } finally {
+                // Restore button state
+                savePasswordBtn.disabled = false;
+                savePasswordBtn.innerHTML = '<i class="fas fa-save"></i> Update Password';
+            }
+        });
+
+        // Save notifications
+        saveNotificationsBtn.addEventListener('click', function() {
+            showNotification('Notification preferences saved!');
+        });
+
+        // Delete account
+        deleteAccountBtn.addEventListener('click', function() {
+            const confirmText = document.getElementById('delete-confirm').value;
+
+            if (confirmText !== 'DELETE') {
+                showNotification('Please type "DELETE" to confirm', true);
+                return;
+            }
+
+            if (confirm('Are you absolutely sure? This will permanently delete your account and all data.')) {
+                showNotification('Account deletion in progress...');
+
+                // Simulate account deletion
+                setTimeout(() => {
+                    showNotification('Your account has been deleted. Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                }, 1500);
+            }
+        });
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+
+            // Set background color based on type
+            if (type === 'error' || type === true) {
+                notification.style.background = '#e74c3c';
+            } else if (type === 'warning') {
+                notification.style.background = '#ff9800';
+            } else {
+                notification.style.background = '#8B4513';
+            }
+
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize user profile on page load
+        loadUserProfile();
+
+        // Logout button
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        });
+
+        // Toggle switch styling
+        const style = document.createElement('style');
+        style.textContent = `
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 60px;
+                height: 34px;
+            }
+
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: .4s;
+            }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+            }
+
+            input:checked + .slider {
+                background-color: #8B4513;
+            }
+
+            input:focus + .slider {
+                box-shadow: 0 0 1px #8B4513;
+            }
+
+
+        // Ripple for settings buttons
+        (function(){
+            const rippleTargets = document.querySelectorAll('.btn');
+            rippleTargets.forEach(btn => btn.addEventListener('click', function(e){
+                const r = this.getBoundingClientRect();
+                const x = (e.clientX||r.width/2) - r.left;
+                const y = (e.clientY||r.height/2) - r.top;
+                const s = document.createElement('span'); s.className='ripple';
+                const size = Math.max(r.width, r.height);
+                s.style.width = s.style.height = size + 'px'; s.style.left = x + 'px'; s.style.top = y + 'px';
+                this.appendChild(s); s.addEventListener('animationend', ()=> s.remove());
+            }));
+        })();
+
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+
+            .slider.round {
+                border-radius: 34px;
+            }
+
+            .slider.round:before {
+                border-radius: 50%;
+            }
+        `;
+        document.head.appendChild(style);
+
+        } // End of authentication check
+    </script>
+</body>
+</html>

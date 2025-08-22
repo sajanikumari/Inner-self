@@ -1,0 +1,2584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InnerSelf Buddy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Landing Page Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
+        }
+
+        body {
+            background-color: #f5cac3;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #5D2906;
+        }
+
+        .page {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 50px; /* Space for footer */
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Landing Page Styles */
+        .landing-page {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .landing-page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cpath d='M50,50 Q60,35 70,50 T90,50 Q100,35 110,50 T130,50 Q140,35 150,50 T170,50 Q180,35 190,50 T210,50 L190,70 Q180,85 170,70 T150,70 Q140,85 130,70 T110,70 Q100,85 90,70 T70,70 Q60,85 50,70 Z' fill='white' opacity='0.15' transform='translate(-20,-20) rotate(15)'/%3E%3C/svg%3E");
+            background-size: 180px;
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        .landing-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            min-height: 90vh;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0 auto;
+        }
+
+        /* Rope and pulley system */
+        .pulley-system {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 150px;
+            z-index: 25;
+            transition: opacity 0.5s;
+        }
+
+        .ceiling {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to bottom, #8B4513, #5D2906);
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .pulley {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: #A9A9A9;
+            border-radius: 50%;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            z-index: 26;
+        }
+
+        .pulley::before {
+            content: "";
+            position: absolute;
+            top: 19px;
+            left: -30px;
+            width: 100px;
+            height: 2px;
+            background: #808080;
+            border-radius: 1px;
+        }
+
+        .rope {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 0;
+            background: #8B4513;
+            border-radius: 2px;
+            z-index: 22;
+            transition: height 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        /* Hanging teddy */
+        .hanging-teddy {
+            position: absolute;
+            top: 160px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 200px;
+            z-index: 30;
+            cursor: pointer;
+            transition: all 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .teddy {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 140px;
+        }
+
+        /* Teddy body parts */
+        .teddy-head {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: #8B4513;
+            border-radius: 50%;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .teddy-ear {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #8B4513;
+            border-radius: 50%;
+            top: -10px;
+            z-index: -1;
+        }
+
+        .ear-left {
+            left: 5px;
+        }
+
+        .ear-right {
+            right: 5px;
+        }
+
+        .inner-ear {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: #A0522D;
+            border-radius: 50%;
+            top: 7px;
+            left: 7px;
+        }
+
+        .teddy-face {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 70px;
+        }
+
+        .teddy-eye {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: #000;
+            border-radius: 50%;
+            top: 15px;
+        }
+
+        .eye-left {
+            left: 10px;
+        }
+
+        .eye-right {
+            right: 10px;
+        }
+
+        .eye-shine {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+        }
+
+        .teddy-nose {
+            position: absolute;
+            width: 25px;
+            height: 15px;
+            background: #5D2906;
+            border-radius: 50%;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .teddy-mouth {
+            position: absolute;
+            width: 30px;
+            height: 15px;
+            border-bottom: 3px solid #5D2906;
+            border-radius: 0 0 50% 50%;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .blush {
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            background: rgba(205, 133, 63, 0.4);
+            border-radius: 50%;
+            top: 40px;
+        }
+
+        .blush-left {
+            left: 0;
+        }
+
+        .blush-right {
+            right: 0;
+        }
+
+        .teddy-body {
+            position: absolute;
+            width: 90px;
+            height: 80px;
+            background: #8B4513;
+            border-radius: 50%;
+            top: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+
+        .teddy-arm {
+            position: absolute;
+            width: 50px;
+            height: 20px;
+            background: #8B4513;
+            border-radius: 10px;
+            top: 95px;
+        }
+
+        .arm-left {
+            left: 0;
+            transform: rotate(30deg);
+        }
+
+        .arm-right {
+            right: 0;
+            transform: rotate(-30deg);
+        }
+
+        .hand {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #8B4513;
+            border-radius: 50%;
+            bottom: -5px;
+        }
+
+        .hand-left {
+            right: -5px;
+        }
+
+        .hand-right {
+            left: -5px;
+        }
+
+        /* Curtain container */
+        .curtain-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin-top: 180px;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        /* Curtain elements */
+        .curtain {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #FFB6C1, #FF69B4);
+            transition: transform 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            transform-origin: top center;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 30px;
+        }
+
+        .curtain-top {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to bottom, #FF1493, #FF69B4);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .curtain-fold {
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 20, 147, 0.4);
+            border-radius: 10px;
+        }
+
+        .curtain-tassel {
+            position: absolute;
+            bottom: 10px;
+            width: 20px;
+            height: 60px;
+            background: #FFD700;
+            border-radius: 10px;
+            z-index: 25;
+        }
+
+        .tassel-left {
+            left: 25%;
+        }
+
+        .tassel-right {
+            right: 25%;
+        }
+
+        .tassel-center {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Welcome message */
+        .welcome-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 1s ease-in-out 0.5s;
+            width: 80%;
+            max-width: 600px;
+            padding: 40px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+                        inset 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .welcome-message h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            color: #5D2906;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .welcome-message p {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            color: #8B4513;
+            font-weight: 500;
+        }
+
+        /* Teddy button */
+        .hanging-teddy.button-mode {
+            position: fixed;
+            top: auto;
+            bottom: 50px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #8B4513;
+            border: 6px solid #5D2906;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transform: translateX(-50%) scale(1);
+            z-index: 40;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .button-mode .teddy {
+            transform: translateX(-50%) scale(0.7);
+            top: 10px;
+        }
+
+        /* Footer */
+        footer {
+            position: absolute;
+            bottom: 10px;
+            color: #5D2906;
+            font-size: 1rem;
+            opacity: 0.8;
+            text-align: center;
+            width: 100%;
+            padding: 0 20px;
+            transition: opacity 0.5s;
+        }
+
+        /* Animations */
+        .curtain.open {
+            transform: scaleY(0);
+        }
+
+        .welcome-message.show {
+            opacity: 1;
+        }
+
+        /* Pull instruction */
+        .pull-instruction {
+            position: absolute;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #5D2906;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            opacity: 0.8;
+            animation: pulse 2s infinite;
+            z-index: 35;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+        }
+
+        /* Login/Signup Form */
+        .form-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.8s ease;
+        }
+
+        .form-container.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f5cac3;
+        }
+
+        .form-tab {
+            padding: 10px 0;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #A0522D;
+            text-align: center;
+            flex: 1;
+            transition: all 0.3s;
+        }
+
+        .form-tab.active {
+            color: #8B4513;
+            border-bottom: 3px solid #8B4513;
+        }
+
+        .form-tab:hover:not(.active) {
+            color: #5D2906;
+        }
+
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            color: #8B4513;
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #5D2906;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e6b28a;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .input-group input:focus {
+            border-color: #8B4513;
+            outline: none;
+            background: white;
+        }
+
+        .form-btn {
+            width: 100%;
+            padding: 14px;
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(139, 69, 19, 0.3);
+        }
+
+        .form-btn:hover {
+            background: #5D2906;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(139, 69, 19, 0.4);
+        }
+
+        .form-btn:active {
+            transform: translateY(0);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #5D2906;
+        }
+
+        .form-footer a {
+            color: #8B4513;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #8B4513;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: rgba(139, 69, 19, 0.1);
+            transform: rotate(90deg);
+        }
+
+        /* Responsive design for landing page */
+        @media (max-width: 768px) {
+            .welcome-message h1 {
+                font-size: 2rem;
+            }
+
+            .welcome-message p {
+                font-size: 1.1rem;
+            }
+
+            .curtain-container {
+                height: 300px;
+                margin-top: 160px;
+            }
+
+            .hanging-teddy.button-mode {
+                width: 120px;
+                height: 120px;
+                bottom: 40px;
+            }
+
+            .pull-instruction {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-message h1 {
+                font-size: 1.6rem;
+            }
+
+            .curtain-container {
+                height: 250px;
+            }
+
+            .hanging-teddy.button-mode {
+                width: 100px;
+                height: 100px;
+            }
+
+            .form-container {
+                width: 90%;
+            }
+        }
+
+        /* App Page Styles */
+        .app-page {
+            background: linear-gradient(135deg, #f9d2cc, #f5cac3);
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .app-page.active {
+            display: flex;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255, 182, 193, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #ffb6c1;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #8b4513;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #8b4513;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #8b4513;
+            font-weight: 500;
+            font-size: 18px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255, 182, 193, 0.3);
+        }
+
+        .nav-links a::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: #ff69b4;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after, .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content Container */
+        .app-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+            gap: 25px;
+            flex: 1;
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #ffb6c1;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: #8b4513;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .user-info h3 {
+            color: #5D2906;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            color: #8B4513;
+            font-size: 14px;
+        }
+
+        .quick-actions {
+            margin-bottom: 30px;
+        }
+
+        .quick-actions h3 {
+            margin-bottom: 15px;
+            color: #8B4513;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 182, 193, 0.2);
+            border-radius: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 182, 193, 0.35);
+            transform: translateX(5px);
+        }
+
+        /* Enhanced Task List Styles */
+        .tasks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .add-task-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .add-task-btn:hover {
+            background: linear-gradient(135deg, #A0522D, #CD853F);
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+        }
+
+        .task-list {
+            min-height: 100px;
+            position: relative;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 182, 193, 0.2);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            user-select: none;
+        }
+
+        .task-item:hover {
+            background: rgba(255, 182, 193, 0.35);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+            cursor: grabbing;
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .task-item.drag-over {
+            border-color: #8B4513;
+            background: rgba(139, 69, 19, 0.1);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            background: rgba(144, 238, 144, 0.3);
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #666;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #8B4513;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .task-checkbox:hover {
+            background: rgba(139, 69, 19, 0.1);
+            transform: scale(1.1);
+        }
+
+        .task-checkbox.checked {
+            background: #8B4513;
+            color: white;
+        }
+
+        .task-icon {
+            width: 36px;
+            height: 36px;
+            background: #ffb6c1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8B4513;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .task-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-text {
+            font-weight: 600;
+            color: #5D2906;
+            font-size: 14px;
+        }
+
+        .task-time {
+            font-size: 12px;
+            color: #8B4513;
+            margin-top: 2px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .task-item:hover .task-actions {
+            opacity: 1;
+        }
+
+        .task-action-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .edit-task-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .delete-task-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .task-action-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .drag-handle {
+            cursor: grab;
+            color: #8B4513;
+            font-size: 16px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .task-item:hover .drag-handle {
+            opacity: 1;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        /* Add Task Form */
+        .add-task-form {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 15px;
+            border: 2px solid #e6b28a;
+            margin-top: 10px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #new-task-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e6b28a;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        #new-task-input:focus {
+            outline: none;
+            border-color: #8B4513;
+        }
+
+        .task-form-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .task-form-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .task-form-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Drop zone indicator */
+        .drop-indicator {
+            height: 3px;
+            background: #8B4513;
+            border-radius: 2px;
+            margin: 5px 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .drop-indicator.active {
+            opacity: 1;
+        }
+
+        /* Mobile Responsiveness for Tasks */
+        @media (max-width: 768px) {
+            .task-item {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .task-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .task-text {
+                font-size: 13px;
+            }
+
+            .task-time {
+                font-size: 11px;
+            }
+
+            .task-actions {
+                opacity: 1; /* Always show on mobile */
+            }
+
+            .add-task-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .drag-handle {
+                opacity: 1; /* Always show on mobile */
+            }
+        }
+
+        .action-btn i {
+            width: 36px;
+            height: 36px;
+            background: #ffb6c1;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #8b4513;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-section {
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 20px;
+            border-radius: 20px;
+            background: linear-gradient(to right, #ffb6c1, #ff69b4);
+        }
+
+        .welcome-section h2 {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .welcome-section p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 2px solid #ffd1dc;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: #ffb6c1;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 30px;
+            color: #8b4513;
+        }
+
+        .feature-card h3 {
+            color: #8B4513;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .feature-card p {
+            color: #5D2906;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #8B4513;
+            color: white;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #5D2906;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+        }
+
+        /* Footer - FIXED POSITION */
+        .app-footer {
+            text-align: center;
+            padding: 15px;
+            color: #8B4513;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        /* Responsive design for app */
+        @media (max-width: 1100px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 15px;
+                height: 60px;
+            }
+
+            .logo-text {
+                font-size: 20px;
+            }
+
+            .nav-links {
+                gap: 10px;
+            }
+
+            .nav-links a {
+                font-size: 16px;
+                padding: 6px 10px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        /* Micro-interactions (non-invasive) */
+        .btn, .form-btn {
+            position: relative;
+            overflow: hidden; /* for ripple */
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn:active, .form-btn:active, .action-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        .nav-links a i, .action-btn i, .btn i {
+            transition: transform 0.2s ease;
+        }
+        .nav-links a:hover i { transform: translateY(-1px); }
+        .action-btn:hover i {
+            transform: scale(1.08);
+            box-shadow: 0 6px 14px rgba(255, 105, 180, 0.35);
+        }
+        .input-group input:focus {
+            box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.35);
+        }
+        .feature-card:focus-within {
+            box-shadow: 0 12px 25px rgba(0,0,0,0.18), 0 0 0 3px rgba(255,182,193,0.35);
+        }
+        /* Button ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 999px;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+            animation: ripple 600ms ease-out forwards;
+        }
+        @keyframes ripple {
+            from { transform: translate(-50%, -50%) scale(0); opacity: 0.7; }
+            to { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+        }
+        /* App fade-in when becoming active */
+        .app-page { opacity: 0; }
+        .app-page.active { opacity: 1; transition: opacity 0.35s ease; }
+        /* Respect reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+            .pull-instruction { animation: none !important; }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landing-page" class="page active landing-page">
+        <div class="landing-container">
+            <!-- Pulley System -->
+            <div class="pulley-system">
+                <div class="ceiling"></div>
+                <div class="pulley"></div>
+                <div class="rope" id="main-rope"></div>
+            </div>
+
+            <!-- Pull instruction -->
+            <div class="pull-instruction" id="pull-instruction"></div>
+
+            <!-- Hanging Teddy -->
+            <div class="hanging-teddy" id="hanging-teddy">
+                <div class="teddy">
+                    <div class="teddy-head">
+                        <div class="teddy-ear ear-left">
+                            <div class="inner-ear"></div>
+                        </div>
+                        <div class="teddy-ear ear-right">
+                            <div class="inner-ear"></div>
+                        </div>
+                        <div class="teddy-face">
+                            <div class="teddy-eye eye-left">
+                                <div class="eye-shine"></div>
+                            </div>
+                            <div class="teddy-eye eye-right">
+                                <div class="eye-shine"></div>
+                            </div>
+                            <div class="teddy-nose"></div>
+                            <div class="teddy-mouth"></div>
+                            <div class="blush blush-left"></div>
+                            <div class="blush blush-right"></div>
+                        </div>
+                    </div>
+                    <div class="teddy-body"></div>
+                    <div class="teddy-arm arm-left">
+                        <div class="hand hand-left"></div>
+                    </div>
+                    <div class="teddy-arm arm-right">
+                        <div class="hand hand-right"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Curtain Container -->
+            <div class="curtain-container">
+                <div class="curtain" id="main-curtain">
+                    <div class="curtain-top"></div>
+                    <div class="curtain-fold"></div>
+                    <div class="curtain-tassel tassel-left"></div>
+                    <div class="curtain-tassel tassel-center"></div>
+                    <div class="curtain-tassel tassel-right"></div>
+                </div>
+
+                <!-- Welcome message -->
+                <div class="welcome-message" id="welcome-message">
+                    <h1>Come and meet your inner self buddy</h1>
+                    <p>Your personal companion for daily reminders and reflections</p>
+                </div>
+            </div>
+
+            <footer id="main-footer">
+                Made with LOVE | by SAJANI KUMARI💞🫶🏻!
+            </footer>
+        </div>
+
+        <!-- Login/Signup Form -->
+        <div class="form-container" id="form-container">
+            <span class="close-btn" id="close-btn">×</span>
+
+            <div class="form-header">
+                <div class="form-tab active" id="login-tab">Login</div>
+                <div class="form-tab" id="signup-tab">Sign Up</div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="form-content active" id="login-form">
+                <h2>Welcome Back!</h2>
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password">
+                </div>
+                <button class="form-btn" id="login-btn">Login</button>
+                <div class="form-footer">
+                    New here? <a id="show-signup">Create an account</a>
+                </div>
+            </div>
+
+            <!-- Signup Form -->
+            <div class="form-content" id="signup-form">
+                <h2>Create Account</h2>
+                <div class="input-group">
+                    <label for="signup-name">Your Name</label>
+                    <input type="text" id="signup-name" placeholder="Enter your full name">
+                </div>
+                <div class="input-group">
+                    <label for="signup-username">Username</label>
+                    <input type="text" id="signup-username" placeholder="Choose a username">
+                </div>
+                <div class="input-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" placeholder="Enter your email">
+                </div>
+                <div class="input-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Create a password">
+                </div>
+                <div class="input-group">
+                    <label for="signup-confirm">Confirm Password</label>
+                    <input type="password" id="signup-confirm" placeholder="Confirm your password">
+                </div>
+                <button class="form-btn" id="signup-btn">Create Account</button>
+                <div class="form-footer">
+                    Already have an account? <a id="show-login">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Page -->
+    <div id="app-page" class="page app-page">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="logo">
+                <div class="logo-icon">🧸</div>
+                <div class="logo-text">Buddy</div>
+            </div>
+            <div class="nav-links">
+                <a href="#" onclick="navigateToPage('home')" class="active"><i class="fas fa-home"></i> Home</a>
+                <a href="#" onclick="navigateToPage('diary')"><i class="fas fa-book"></i> Diary</a>
+                <a href="#" onclick="navigateToPage('reminders')"><i class="fas fa-bell"></i> Reminders</a>
+                <a href="#" onclick="navigateToPage('calendar')"><i class="fas fa-calendar"></i> Calendar</a>
+                <a href="#" onclick="navigateToPage('settings')"><i class="fas fa-cog"></i> Settings</a>
+                <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+
+        <!-- Main App Container -->
+        <div class="app-container">
+            <!-- Left Sidebar -->
+            <div class="sidebar">
+                <div class="user-profile">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <h3>Hello, User!</h3>
+                        <p>Have a productive day! 🌞</p>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                    <div class="action-btn" onclick="navigateToPage('reminders')">
+                        <i class="fas fa-plus"></i>
+                        <div>Add New Reminder</div>
+                    </div>
+                    <div class="action-btn" onclick="navigateToPage('diary')">
+                        <i class="fas fa-pen"></i>
+                        <div>Write Diary Entry</div>
+                    </div>
+                    <div class="action-btn" onclick="navigateToPage('calendar')">
+                        <i class="fas fa-calendar-check"></i>
+                        <div>Schedule Event</div>
+                    </div>
+                    <div class="action-btn" onclick="navigateToPage('settings')">
+                        <i class="fas fa-music"></i>
+                        <div>Set Relaxation Time</div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <div class="tasks-header">
+                        <h3><i class="fas fa-tasks"></i> Today's Tasks</h3>
+                        <button class="add-task-btn" id="add-task-btn" title="Add new task">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <div class="task-list" id="task-list">
+                        <!-- Tasks will be dynamically generated -->
+                    </div>
+
+                    <!-- Add Task Form (initially hidden) -->
+                    <div class="add-task-form" id="add-task-form" style="display: none;">
+                        <input type="text" id="new-task-input" placeholder="Enter new task..." maxlength="50">
+                        <div class="task-form-buttons">
+                            <button class="task-form-btn save-btn" id="save-task-btn">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="task-form-btn cancel-btn" id="cancel-task-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <div class="welcome-section">
+                    <h2>Welcome to Your Personal Companion! 🧸</h2>
+                    <p>Your all-in-one space for reminders, diary entries, and schedule management</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3>Voice Diary</h3>
+                        <p>Express your thoughts with voice-to-text diary entries. Our app will detect your mood and tag entries automatically.</p>
+                        <button class="btn" onclick="navigateToPage('diary')">Start Journaling</button>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h3>Smart Reminders</h3>
+                        <p>Set reminders with custom pre-alerts. Never miss important tasks with our sticky-note style notification system.</p>
+                        <button class="btn" onclick="navigateToPage('reminders')">Create Reminder</button>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <h3>Family Calendar</h3>
+                        <p>Coordinate with family members using our shared calendar. Color-code events and set family reminders.</p>
+                        <button class="btn" onclick="navigateToPage('calendar')">View Calendar</button>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3>Memory Lane</h3>
+                        <p>Revisit your past entries with our "Memory Lane" feature. See how you've grown over time with mood analytics.</p>
+                        <button class="btn" onclick="navigateToPage('diary')">Explore Memories</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fixed Footer -->
+        <footer class="app-footer">
+            Made with LOVE | by SAJANI KUMARI💞🫶🏻
+        </footer>
+    </div>
+
+
+
+    <script>
+        // DOM elements
+        const landingPage = document.getElementById('landing-page');
+        const appPage = document.getElementById('app-page');
+        const teddy = document.getElementById('hanging-teddy');
+        const curtain = document.getElementById('main-curtain');
+        const rope = document.getElementById('main-rope');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const formContainer = document.getElementById('form-container');
+        const closeBtn = document.getElementById('close-btn');
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const footer = document.getElementById('main-footer');
+        const pullInstruction = document.getElementById('pull-instruction');
+
+        // Form elements
+        const loginTab = document.getElementById('login-tab');
+        const signupTab = document.getElementById('signup-tab');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const showSignup = document.getElementById('show-signup');
+        const showLogin = document.getElementById('show-login');
+
+        // Authentication state (managed by backend)
+        let currentUser = null;
+
+        let curtainOpened = false;
+
+        // Open curtain animation
+        function openCurtain() {
+            if (curtainOpened) return;
+
+            curtainOpened = true;
+
+            // Animate rope extending
+            rope.style.height = '160px';
+
+            // Hide pull instruction
+            pullInstruction.style.opacity = '0';
+
+            // Add slight delay before curtain animation
+            setTimeout(() => {
+                curtain.classList.add('open');
+            }, 300);
+
+            // Show welcome message after curtain opens
+            setTimeout(() => {
+                welcomeMessage.classList.add('show');
+            }, 1000);
+
+            // Transform teddy into button
+            setTimeout(() => {
+                teddy.classList.add('button-mode');
+                teddy.style.cursor = 'pointer';
+                teddy.onclick = showForm;
+
+                // Hide pulley system
+                document.querySelector('.pulley-system').style.opacity = '0';
+
+                // Hide footer as requested
+                footer.style.opacity = '0';
+            }, 1500);
+        }
+
+        // Show login/signup form
+        function showForm() {
+            // Show form
+            formContainer.classList.add('show');
+        }
+
+        // Hide login/signup form
+        function hideForm() {
+            formContainer.classList.remove('show');
+        }
+
+        // Switch to signup form
+        function showSignupForm() {
+            loginTab.classList.remove('active');
+            signupTab.classList.add('active');
+            loginForm.classList.remove('active');
+            signupForm.classList.add('active');
+        }
+
+        // Switch to login form
+        function showLoginForm() {
+            signupTab.classList.remove('active');
+            loginTab.classList.add('active');
+            signupForm.classList.remove('active');
+            loginForm.classList.add('active');
+        }
+
+        // Login function with backend connection
+async function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+        alert('Please enter both username and password');
+        return;
+    }
+
+    // Show loading state
+    const loginBtn = document.getElementById('login-btn');
+    const originalText = loginBtn.textContent;
+    loginBtn.textContent = 'Logging in...';
+    loginBtn.disabled = true;
+
+    try {
+        console.log('🔄 Attempting login for:', username);
+        const response = await fetch('http://localhost:5000/api/auth/login',  {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log('✅ Login successful for:', data.user.name);
+
+            // Save token and user data
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            // Hide form
+            hideForm();
+
+            // Redirect to app page
+            showAppPage(data.user.name);
+
+            // Clear form
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        } else {
+            console.log('❌ Login failed:', data.message);
+            alert(data.message || 'Login failed. Please check your credentials.');
+        }
+    } catch (error) {
+        console.error('❌ Login network error:', error);
+        alert('Network error. Please check if the server is running and try again.');
+    } finally {
+        // Restore button state
+        loginBtn.textContent = originalText;
+        loginBtn.disabled = false;
+    }
+}
+
+// Signup function with backend connection
+async function signup() {
+    const name = document.getElementById('signup-name').value;
+    const username = document.getElementById('signup-username').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById('signup-confirm').value;
+
+    // Validation
+    if (!name || !username || !email || !password || !confirmPassword) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert('Passwords do not match');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:5000/api/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, username, email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.status === 201) {
+            alert('Account created! Please login');
+            showLoginForm();
+        } else {
+            alert(data.message || 'Signup failed');
+        }
+    } catch (error) {
+        console.error('Signup error:', error);
+        alert('Network error. Please try again.');
+    }
+}
+        // Show app page
+        function showAppPage(userName) {
+            // Get user from localStorage
+            const userData = localStorage.getItem('user');
+            if (!userData) {
+                alert('User not found. Please login again.');
+                return;
+            }
+
+            const user = JSON.parse(userData);
+
+            // Hide landing page
+            landingPage.classList.remove('active');
+
+            // Show app page
+            appPage.classList.add('active');
+
+            // Update username in app page
+            document.querySelector('.user-info h3').textContent = `Hello, ${user.name}!`;
+
+            // Initialize task manager
+            setTimeout(() => {
+                initTaskManager();
+            }, 100);
+        }
+        // Add event listeners
+        teddy.addEventListener('click', openCurtain);
+        closeBtn.addEventListener('click', hideForm);
+        loginBtn.addEventListener('click', login);
+        signupBtn.addEventListener('click', signup);
+        showSignup.addEventListener('click', showSignupForm);
+        showLogin.addEventListener('click', showLoginForm);
+        loginTab.addEventListener('click', showLoginForm);
+        signupTab.addEventListener('click', showSignupForm);
+
+
+            // Subtle ripple on primary buttons
+            const rippleTargets = document.querySelectorAll('.btn, .form-btn');
+            rippleTargets.forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple';
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    this.appendChild(ripple);
+                    ripple.addEventListener('animationend', () => ripple.remove());
+                });
+            });
+
+            // Hover lift and glow for feature cards (already have hover, add subtle glow)
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.boxShadow = '0 12px 25px rgba(0,0,0,0.15), 0 0 0 3px rgba(255,182,193,0.25)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.boxShadow = '0 5px 15px rgba(0,0,0,0.08)';
+                });
+            });
+
+            // Active state flash for action buttons
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('mousedown', () => btn.style.filter = 'brightness(1.05)');
+                btn.addEventListener('mouseup', () => btn.style.filter = 'none');
+                btn.addEventListener('mouseleave', () => btn.style.filter = 'none');
+            });
+
+        // Add keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                if(!curtainOpened) {
+                    openCurtain();
+                } else if(!formContainer.classList.contains('show')) {
+                    showForm();
+                }
+            }
+        });
+
+        // Initialize page visibility
+        // Check if user is already logged in and token is valid
+        async function checkExistingAuth() {
+            const existingUser = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+
+            if (existingUser && token) {
+                try {
+                    // Verify token is still valid by making a request to the backend
+                    const response = await fetch('http://localhost:5000/api/auth/me', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (response.ok) {
+                        // Token is valid, show app page
+                        landingPage.classList.remove('active');
+                        appPage.classList.add('active');
+                        const user = JSON.parse(existingUser);
+                        document.querySelector('.user-info h3').textContent = `Hello, ${user.name}!`;
+                        console.log('✅ Auto-login successful for:', user.name);
+
+                        // Initialize task manager
+                        setTimeout(() => {
+                            initTaskManager();
+                        }, 100);
+                        return;
+                    } else {
+                        // Token is invalid, clear storage
+                        console.log('❌ Token expired or invalid, clearing auth data');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                    }
+                } catch (error) {
+                    console.log('❌ Auth check failed:', error);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                }
+            }
+
+            // User is not logged in or token invalid, show landing page
+            landingPage.classList.add('active');
+            appPage.classList.remove('active');
+        }
+
+        // Call the auth check
+        checkExistingAuth();
+
+        // Navigation function
+        function navigateToPage(page) {
+            // Check if user is authenticated
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            if (!token || !user) {
+                alert('Please login first to access this feature.');
+                return;
+            }
+
+            // Map page names to file names
+            const pageMap = {
+                'home': 'index.html',
+                'diary': 'diary.html',
+                'reminders': 'reminders.html',
+                'calendar': 'calender.html', // Note: keeping the original filename
+                'settings': 'settings.html'
+            };
+
+            const fileName = pageMap[page];
+            if (fileName) {
+                // Add authentication data to URL for seamless transition
+                const url = new URL(fileName, window.location.origin + window.location.pathname.replace('index.html', ''));
+
+                // Store current page for back navigation
+                localStorage.setItem('previousPage', 'index.html');
+
+                // Navigate to the page
+                window.location.href = url.href;
+            } else {
+                console.error('Unknown page:', page);
+                alert('Page not found: ' + page);
+            }
+        }
+
+        // Update navigation active state
+        function updateNavActiveState(currentPage) {
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            const pageMap = {
+                'index.html': 'home',
+                'diary.html': 'diary',
+                'reminders.html': 'reminders',
+                'calender.html': 'calendar',
+                'settings.html': 'settings'
+            };
+
+            const currentPageKey = pageMap[currentPage];
+            if (currentPageKey) {
+                const activeLink = document.querySelector(`[onclick="navigateToPage('${currentPageKey}')"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+            }
+        }
+
+        // Task Management System
+        class TaskManager {
+            constructor() {
+                this.tasks = this.loadTasks();
+                this.draggedElement = null;
+                this.init();
+            }
+
+            async init() {
+                this.tasks = await this.loadTasks();
+                this.renderTasks();
+                this.setupEventListeners();
+            }
+
+            async loadTasks() {
+                try {
+                    console.log('📡 Loading tasks from backend...');
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        console.warn('No auth token, using default tasks');
+                        return this.getDefaultTasks();
+                    }
+
+                    const response = await fetch('http://localhost:5000/api/tasks', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const backendTasks = await response.json();
+                        console.log('✅ Loaded', backendTasks.length, 'tasks from backend');
+
+                        // Convert backend format to frontend format
+                        const tasks = backendTasks.map(task => ({
+                            id: task._id,
+                            text: task.text,
+                            time: task.time,
+                            icon: task.icon,
+                            completed: task.completed,
+                            order: task.order
+                        }));
+
+                        // Update localStorage backup
+                        localStorage.setItem('innerself_tasks', JSON.stringify(tasks));
+                        return tasks;
+                    } else {
+                        throw new Error(`Backend error: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Failed to load from backend:', error.message);
+                    console.log('📱 Falling back to localStorage...');
+
+                    // Fallback to localStorage
+                    const saved = localStorage.getItem('innerself_tasks');
+                    if (saved) {
+                        return JSON.parse(saved);
+                    }
+                    return this.getDefaultTasks();
+                }
+            }
+
+            getDefaultTasks() {
+                return [
+                    { id: '1', text: 'Grocery Shopping', time: '4 PM', icon: 'fas fa-shopping-cart', completed: false, order: 0 },
+                    { id: '2', text: 'Call Mom', time: '7 PM', icon: 'fas fa-phone', completed: false, order: 1 },
+                    { id: '3', text: 'Read 30 minutes', time: '', icon: 'fas fa-book', completed: false, order: 2 }
+                ];
+            }
+
+            async saveTasks() {
+                // Update localStorage backup
+                localStorage.setItem('innerself_tasks', JSON.stringify(this.tasks));
+            }
+
+            async saveTaskToBackend(taskData) {
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) throw new Error('No auth token');
+
+                    const response = await fetch('http://localhost:5000/api/tasks', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(taskData)
+                    });
+
+                    if (response.ok) {
+                        const savedTask = await response.json();
+                        console.log('✅ Task saved to backend:', savedTask.text);
+                        return savedTask;
+                    } else {
+                        throw new Error(`Backend error: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('❌ Failed to save task to backend:', error);
+                    throw error;
+                }
+            }
+
+            async updateTaskInBackend(taskId, taskData) {
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) throw new Error('No auth token');
+
+                    const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(taskData)
+                    });
+
+                    if (response.ok) {
+                        const updatedTask = await response.json();
+                        console.log('✅ Task updated in backend:', updatedTask.text);
+                        return updatedTask;
+                    } else {
+                        throw new Error(`Backend error: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('❌ Failed to update task in backend:', error);
+                    throw error;
+                }
+            }
+
+            async deleteTaskFromBackend(taskId) {
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) throw new Error('No auth token');
+
+                    const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        console.log('✅ Task deleted from backend');
+                    } else {
+                        throw new Error(`Backend error: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('❌ Failed to delete task from backend:', error);
+                    throw error;
+                }
+            }
+
+            renderTasks() {
+                const taskList = document.getElementById('task-list');
+                taskList.innerHTML = '';
+
+                this.tasks.forEach((task, index) => {
+                    const taskElement = this.createTaskElement(task, index);
+                    taskList.appendChild(taskElement);
+                });
+            }
+
+            createTaskElement(task, index) {
+                const taskItem = document.createElement('div');
+                taskItem.className = `task-item ${task.completed ? 'completed' : ''}`;
+                taskItem.draggable = true;
+                taskItem.dataset.taskId = task.id;
+                taskItem.dataset.index = index;
+
+                taskItem.innerHTML = `
+                    <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="taskManager.toggleTask('${task.id}')">
+                        ${task.completed ? '<i class="fas fa-check"></i>' : ''}
+                    </div>
+                    <div class="task-icon">
+                        <i class="${task.icon}"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-text">${task.text}</div>
+                        ${task.time ? `<div class="task-time">${task.time}</div>` : ''}
+                    </div>
+                    <div class="task-actions">
+                        <button class="task-action-btn edit-task-btn" onclick="taskManager.editTask('${task.id}')" title="Edit task">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="task-action-btn delete-task-btn" onclick="taskManager.deleteTask('${task.id}')" title="Delete task">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="drag-handle">
+                        <i class="fas fa-grip-vertical"></i>
+                    </div>
+                `;
+
+                // Add drag event listeners
+                taskItem.addEventListener('dragstart', (e) => this.handleDragStart(e));
+                taskItem.addEventListener('dragover', (e) => this.handleDragOver(e));
+                taskItem.addEventListener('drop', (e) => this.handleDrop(e));
+                taskItem.addEventListener('dragend', (e) => this.handleDragEnd(e));
+
+                return taskItem;
+            }
+
+            setupEventListeners() {
+                // Add task button
+                document.getElementById('add-task-btn').addEventListener('click', () => {
+                    this.showAddTaskForm();
+                });
+
+                // Save task button
+                document.getElementById('save-task-btn').addEventListener('click', () => {
+                    this.saveNewTask();
+                });
+
+                // Cancel task button
+                document.getElementById('cancel-task-btn').addEventListener('click', () => {
+                    this.hideAddTaskForm();
+                });
+
+                // Enter key in input
+                document.getElementById('new-task-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.saveNewTask();
+                    } else if (e.key === 'Escape') {
+                        this.hideAddTaskForm();
+                    }
+                });
+            }
+
+            showAddTaskForm() {
+                const form = document.getElementById('add-task-form');
+                form.style.display = 'block';
+                document.getElementById('new-task-input').focus();
+            }
+
+            hideAddTaskForm() {
+                const form = document.getElementById('add-task-form');
+                form.style.display = 'none';
+                document.getElementById('new-task-input').value = '';
+            }
+
+            async saveNewTask() {
+                const input = document.getElementById('new-task-input');
+                const text = input.value.trim();
+
+                if (!text) return;
+
+                try {
+                    const taskData = {
+                        text: text,
+                        time: '',
+                        icon: 'fas fa-circle',
+                        completed: false,
+                        order: this.tasks.length
+                    };
+
+                    // Save to backend first
+                    const savedTask = await this.saveTaskToBackend(taskData);
+
+                    // Add to local array with backend ID
+                    const newTask = {
+                        id: savedTask._id,
+                        text: savedTask.text,
+                        time: savedTask.time,
+                        icon: savedTask.icon,
+                        completed: savedTask.completed,
+                        order: savedTask.order
+                    };
+
+                    this.tasks.push(newTask);
+                    this.saveTasks();
+                    this.renderTasks();
+                    this.hideAddTaskForm();
+                } catch (error) {
+                    console.error('Failed to save task:', error);
+                    // Fallback to local storage only
+                    const newTask = {
+                        id: Date.now().toString(),
+                        text: text,
+                        time: '',
+                        icon: 'fas fa-circle',
+                        completed: false,
+                        order: this.tasks.length
+                    };
+
+                    this.tasks.push(newTask);
+                    this.saveTasks();
+                    this.renderTasks();
+                    this.hideAddTaskForm();
+                }
+            }
+
+            async toggleTask(taskId) {
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task) {
+                    const newCompleted = !task.completed;
+
+                    try {
+                        // Update in backend
+                        await this.updateTaskInBackend(taskId, { completed: newCompleted });
+
+                        // Update local state
+                        task.completed = newCompleted;
+                        this.saveTasks();
+                        this.renderTasks();
+                    } catch (error) {
+                        console.error('Failed to toggle task:', error);
+                        // Still update locally as fallback
+                        task.completed = newCompleted;
+                        this.saveTasks();
+                        this.renderTasks();
+                    }
+                }
+            }
+
+            async editTask(taskId) {
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task) {
+                    const newText = prompt('Edit task:', task.text);
+                    if (newText && newText.trim()) {
+                        try {
+                            // Update in backend
+                            await this.updateTaskInBackend(taskId, { text: newText.trim() });
+
+                            // Update local state
+                            task.text = newText.trim();
+                            this.saveTasks();
+                            this.renderTasks();
+                        } catch (error) {
+                            console.error('Failed to edit task:', error);
+                            // Still update locally as fallback
+                            task.text = newText.trim();
+                            this.saveTasks();
+                            this.renderTasks();
+                        }
+                    }
+                }
+            }
+
+            async deleteTask(taskId) {
+                if (confirm('Are you sure you want to delete this task?')) {
+                    try {
+                        // Delete from backend
+                        await this.deleteTaskFromBackend(taskId);
+
+                        // Remove from local array
+                        this.tasks = this.tasks.filter(t => t.id !== taskId);
+                        this.saveTasks();
+                        this.renderTasks();
+                    } catch (error) {
+                        console.error('Failed to delete task:', error);
+                        // Still delete locally as fallback
+                        this.tasks = this.tasks.filter(t => t.id !== taskId);
+                        this.saveTasks();
+                        this.renderTasks();
+                    }
+                }
+            }
+
+            // Drag and Drop handlers
+            handleDragStart(e) {
+                this.draggedElement = e.target;
+                e.target.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', e.target.outerHTML);
+
+                // Add visual feedback to other tasks
+                document.querySelectorAll('.task-item:not(.dragging)').forEach(task => {
+                    task.style.transition = 'all 0.3s ease';
+                    task.style.opacity = '0.7';
+                });
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+
+                const afterElement = this.getDragAfterElement(e.clientY);
+                const dragging = document.querySelector('.dragging');
+                const taskList = document.getElementById('task-list');
+
+                if (afterElement == null) {
+                    taskList.appendChild(dragging);
+                } else {
+                    taskList.insertBefore(dragging, afterElement);
+                }
+            }
+
+            handleDrop(e) {
+                e.preventDefault();
+                this.updateTaskOrder();
+            }
+
+            handleDragEnd(e) {
+                e.target.classList.remove('dragging');
+                this.draggedElement = null;
+
+                // Restore visual feedback
+                document.querySelectorAll('.task-item').forEach(task => {
+                    task.style.opacity = '';
+                    task.style.transition = '';
+                });
+            }
+
+            getDragAfterElement(y) {
+                const taskList = document.getElementById('task-list');
+                const draggableElements = [...taskList.querySelectorAll('.task-item:not(.dragging)')];
+
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+
+            updateTaskOrder() {
+                const taskElements = document.querySelectorAll('.task-item');
+                const newOrder = [];
+
+                taskElements.forEach(element => {
+                    const taskId = element.dataset.taskId;
+                    const task = this.tasks.find(t => t.id === taskId);
+                    if (task) {
+                        newOrder.push(task);
+                    }
+                });
+
+                this.tasks = newOrder;
+                this.saveTasks();
+            }
+        }
+
+        // Initialize task manager when app page is shown
+        let taskManager;
+
+        function initTaskManager() {
+            if (!taskManager) {
+                taskManager = new TaskManager();
+            }
+        }
+
+        // Initialize task manager after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            if (document.getElementById('task-list')) {
+                initTaskManager();
+            }
+        }, 1000);
+
+        // Initialize rope height
+        setTimeout(() => {
+            rope.style.height = '160px';
+        }, 1000);
+
+        // App page interactivity - Updated to work with new navigation
+        // Note: Action buttons and feature buttons now use onclick attributes for navigation
+        // This section is kept for any additional interactivity that might be needed
+
+        // Debug function to check authentication status
+        function showAuthDebug() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            let debugInfo = '🔍 AUTHENTICATION DEBUG INFO:\n\n';
+            debugInfo += `📱 Browser Storage:\n`;
+            debugInfo += `• Token: ${token ? '✅ Present' : '❌ Missing'}\n`;
+            debugInfo += `• User Data: ${user ? '✅ Present' : '❌ Missing'}\n\n`;
+
+            if (user) {
+                const userData = JSON.parse(user);
+                debugInfo += `👤 User Details:\n`;
+                debugInfo += `• Name: ${userData.name}\n`;
+                debugInfo += `• Username: ${userData.username}\n`;
+                debugInfo += `• ID: ${userData.id}\n\n`;
+            }
+
+            if (token) {
+                debugInfo += `🔑 Token Info:\n`;
+                debugInfo += `• Length: ${token.length} characters\n`;
+                debugInfo += `• Preview: ${token.substring(0, 50)}...\n\n`;
+            }
+
+            debugInfo += `🗄️ Database Users (from last check):\n`;
+            debugInfo += `• gagan (gagan@gmail.com)\n`;
+            debugInfo += `• gagan1 (gagan1@gmail.com)\n`;
+            debugInfo += `• gagandeep (gagandeep@gmail.com)\n\n`;
+
+            debugInfo += `💡 Troubleshooting Tips:\n`;
+            debugInfo += `• If no token: You need to login again\n`;
+            debugInfo += `• If login fails: Check username/password\n`;
+            debugInfo += `• If server error: Ensure server is running\n`;
+            debugInfo += `• Open browser console (F12) for detailed logs`;
+
+            alert(debugInfo);
+        }
+
+        // Add to your app page script
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            console.log('🚪 User logging out');
+            // Clear authentication data
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+
+            // Hide app page
+            appPage.classList.remove('active');
+
+            // Show landing page
+            landingPage.classList.add('active');
+
+            // Reset curtain state
+            curtainOpened = false;
+            curtain.classList.remove('open');
+            welcomeMessage.classList.remove('show');
+            teddy.classList.remove('button-mode');
+
+            console.log('✅ Logout complete, redirected to landing page');
+            teddy.style.cursor = 'default';
+            teddy.onclick = openCurtain;
+
+            // Show pulley system and footer again
+            document.querySelector('.pulley-system').style.opacity = '1';
+            footer.style.opacity = '1';
+            pullInstruction.style.opacity = '0.8';
+        });
+
+// Add to your script section
+let mediaRecorder;
+let audioChunks = [];
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = event => {
+      audioChunks.push(event.data);
+    };
+
+    mediaRecorder.start();
+    document.getElementById('record-btn').textContent = '⏹ Stop Recording';
+  } catch (error) {
+    console.error('Error accessing microphone:', error);
+  }
+}
+
+function stopRecording() {
+  mediaRecorder.stop();
+  mediaRecorder.onstop = async () => {
+    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+
+    // Upload to server and get URL
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.wav');
+
+    try {
+      const response = await fetch('/api/voice/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const { url } = await response.json();
+
+      // Convert to text
+      const textResponse = await fetch('/api/voice/transcribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audioUrl: url })
+      });
+      const { text } = await textResponse.json();
+
+      document.getElementById('diary-content').value = text;
+    } catch (error) {
+      console.error('Error processing audio:', error);
+    }
+
+    document.getElementById('record-btn').textContent = '🎤 Start Recording';
+  };
+}
+
+    </script>
+</body>
+</html>

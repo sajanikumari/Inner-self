@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; margin: 5px; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>InnerSelf Buddy - Authentication Test</h1>
+    
+    <div class="section">
+        <h3>Current Authentication Status</h3>
+        <button onclick="checkAuthStatus()">Check Auth Status</button>
+        <div id="auth-status" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Test Login</h3>
+        <input type="text" id="test-username" placeholder="Username" value="gagan">
+        <input type="password" id="test-password" placeholder="Password">
+        <button onclick="testLogin()">Test Login</button>
+        <div id="login-result" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h3>List All Users (from Database)</h3>
+        <button onclick="listUsers()">List Users</button>
+        <div id="users-list" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Clear Local Storage</h3>
+        <button onclick="clearAuth()">Clear Authentication Data</button>
+        <div id="clear-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        function checkAuthStatus() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            let status = '<h4>Local Storage Status:</h4>';
+            status += `<p><strong>Token:</strong> ${token ? 'Present' : 'Not found'}</p>`;
+            status += `<p><strong>User Data:</strong> ${user ? JSON.stringify(JSON.parse(user), null, 2) : 'Not found'}</p>`;
+            
+            if (token) {
+                status += '<p><strong>Token Preview:</strong> ' + token.substring(0, 50) + '...</p>';
+            }
+            
+            document.getElementById('auth-status').innerHTML = status;
+        }
+
+        async function testLogin() {
+            const username = document.getElementById('test-username').value;
+            const password = document.getElementById('test-password').value;
+            
+            if (!username || !password) {
+                document.getElementById('login-result').innerHTML = '<p style="color: red;">Please enter username and password</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    document.getElementById('login-result').innerHTML = 
+                        `<p style="color: green;">Login successful!</p>
+                         <p><strong>User:</strong> ${data.user.name} (${data.user.username})</p>
+                         <p><strong>Token saved to localStorage</strong></p>`;
+                } else {
+                    document.getElementById('login-result').innerHTML = 
+                        `<p style="color: red;">Login failed: ${data.message}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('login-result').innerHTML = 
+                    `<p style="color: red;">Network error: ${error.message}</p>`;
+            }
+        }
+
+        async function listUsers() {
+            try {
+                // This would require a special endpoint to list users (for testing only)
+                document.getElementById('users-list').innerHTML = 
+                    `<p>To see users in database, run this command in your terminal:</p>
+                     <code>cd server && node scripts/list-users.js</code>
+                     <p>Based on previous check, you have these users:</p>
+                     <ul>
+                        <li>gagan (gagan@gmail.com)</li>
+                        <li>gagan1 (gagan1@gmail.com)</li>
+                        <li>gagandeep (gagandeep@gmail.com)</li>
+                     </ul>`;
+            } catch (error) {
+                document.getElementById('users-list').innerHTML = 
+                    `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function clearAuth() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            document.getElementById('clear-result').innerHTML = 
+                '<p style="color: green;">Authentication data cleared from localStorage</p>';
+        }
+
+        // Check status on page load
+        window.onload = function() {
+            checkAuthStatus();
+        };
+    </script>
+</body>
+</html>

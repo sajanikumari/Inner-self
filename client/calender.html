@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InnerSelf Buddy - Calendar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f9d2cc, #f5cac3);
+            min-height: 100vh;
+            color: #5D2906;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255, 182, 193, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #ffb6c1;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #8b4513;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #8b4513;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #8b4513;
+            font-weight: 500;
+            font-size: 18px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255, 182, 193, 0.3);
+        }
+
+        .nav-links a::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: #ff69b4;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after, .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Calendar Container */
+        .calendar-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 1200px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 2px solid #ffd1dc;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .calendar-header h2 {
+            color: #8B4513;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .calendar-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+        }
+
+        .btn:hover {
+            background: #5D2906;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 69, 19, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #5D2906;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .calendar-day-header {
+            background: #ffb6c1;
+            color: #8B4513;
+            text-align: center;
+            padding: 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .calendar-day {
+            background: rgba(255, 255, 255, 0.7);
+            min-height: 120px;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .calendar-day:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            background: white;
+        }
+
+        .day-number {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ffb6c1;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #8B4513;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .today .day-number {
+            background: #8B4513;
+            color: white;
+            box-shadow: 0 0 10px rgba(139, 69, 19, 0.5);
+        }
+
+        .event-list {
+            margin-top: 30px;
+            max-height: 80px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .event-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .event-list::-webkit-scrollbar-track {
+            background: rgba(255, 182, 193, 0.2);
+            border-radius: 10px;
+        }
+
+        .event-list::-webkit-scrollbar-thumb {
+            background: #ffb6c1;
+            border-radius: 10px;
+        }
+
+        .event-item {
+            background: rgba(255, 182, 193, 0.2);
+            border-radius: 10px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid;
+        }
+
+        .event-item:hover {
+            background: rgba(255, 182, 193, 0.4);
+            transform: translateX(3px);
+        }
+
+        .event-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .event-time {
+            font-weight: bold;
+            color: #8B4513;
+        }
+
+        .event-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        /* Month Navigation */
+        .month-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 0 10px;
+        }
+
+        .nav-btn {
+            background: #8B4513;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        .nav-btn:hover {
+            background: #5D2906;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+        }
+
+        .current-month {
+            font-size: 24px;
+            font-weight: bold;
+            color: #8B4513;
+            text-align: center;
+        }
+
+        /* Event Details Modal */
+        .event-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            position: relative;
+            border-top: 10px solid;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #8B4513;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: rgba(139, 69, 19, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .event-details h3 {
+            color: #5D2906;
+            margin-bottom: 15px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .event-info {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #ffb6c1;
+        }
+
+        .event-info div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #8B4513;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            padding: 20px;
+            color: #8B4513;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.8);
+            width: 100%;
+            position: relative;
+            margin-top: 20px;
+            border-top: 2px solid rgba(255, 182, 193, 0.4);
+        }
+
+        /* Responsive design */
+        @media (max-width: 1100px) {
+            .calendar-container {
+                margin: 30px 20px;
+                padding: 25px;
+            }
+
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .nav-links a {
+                font-size: 16px;
+                padding: 6px 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .calendar-day {
+                min-height: 100px;
+                padding: 10px;
+            }
+
+            .event-list {
+                max-height: 60px;
+            }
+
+            .event-item {
+                font-size: 12px;
+                padding: 5px 8px;
+            }
+
+            .calendar-day-header {
+                padding: 10px;
+                font-size: 16px;
+            }
+
+            .month-navigation {
+                margin-bottom: 15px;
+            }
+
+            .current-month {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-grid {
+                gap: 5px;
+            }
+
+            .calendar-day {
+                min-height: 80px;
+                padding: 8px;
+            }
+
+            .day-number {
+                width: 25px;
+                height: 25px;
+                font-size: 14px;
+            }
+
+            .event-item {
+                font-size: 11px;
+            }
+
+            .nav-links {
+                gap: 10px;
+            }
+
+            .nav-links a {
+                font-size: 14px;
+                padding: 5px 8px;
+            }
+
+            .logo-text {
+                font-size: 20px;
+            }
+
+            .calendar-header h2 {
+                font-size: 26px;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 16px;
+            }
+        }
+    </style>
+    <style>
+        /* Micro-interactions (non-invasive) */
+        .btn, .nav-btn { position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        .btn:active, .nav-btn:active { transform: translateY(0) scale(0.98); }
+        .nav-links a i, .btn i { transition: transform 0.2s ease; }
+        .nav-links a:hover i { transform: translateY(-1px); }
+        .ripple { position: absolute; border-radius: 999px; transform: translate(-50%,-50%) scale(0);
+            background: rgba(255,255,255,0.5); pointer-events: none; animation: ripple 600ms ease-out forwards; }
+        @keyframes ripple { from { opacity:.7; transform: translate(-50%,-50%) scale(0);} to { opacity:0; transform: translate(-50%,-50%) scale(4);} }
+        @media (prefers-reduced-motion: reduce) { * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; } }
+    </style>
+
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">🧸</div>
+            <div class="logo-text">Buddy</div>
+        </div>
+        <div class="nav-links">
+            <a href="index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="diary.html"><i class="fas fa-book"></i> Diary</a>
+            <a href="reminders.html"><i class="fas fa-bell"></i> Reminders</a>
+            <a href="calendar.html" class="active"><i class="fas fa-calendar"></i> Calendar</a>
+            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+
+    <!-- Calendar Container -->
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <h2>
+                <i class="fas fa-calendar"></i> hello buddy
+            </h2>
+            <div class="calendar-actions">
+                <button class="btn" id="add-event-btn">
+                    <i class="fas fa-plus"></i> Add Event
+                </button>
+                <button class="btn btn-secondary" id="refresh-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Month Navigation -->
+        <div class="month-navigation">
+            <button class="nav-btn" id="prev-month">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="current-month" id="current-month">August 2025</div>
+            <button class="nav-btn" id="next-month">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="calendar-grid">
+            <div class="calendar-day-header">Sunday</div>
+            <div class="calendar-day-header">Monday</div>
+            <div class="calendar-day-header">Tuesday</div>
+            <div class="calendar-day-header">Wednesday</div>
+            <div class="calendar-day-header">Thursday</div>
+            <div class="calendar-day-header">Friday</div>
+            <div class="calendar-day-header">Saturday</div>
+
+            <!-- Calendar days will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="event-modal" id="event-modal">
+        <div class="modal-content" id="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <div class="event-details" id="event-details">
+                <h3><i class="fas fa-calendar-check"></i> <span id="event-title">Reminder Details</span></h3>
+                <div class="event-info">
+                    <div><i class="fas fa-clock"></i> <span id="event-time">Date & Time</span></div>
+                    <div><i class="fas fa-sticky-note"></i> <span id="event-description">Description</span></div>
+                    <div><i class="fas fa-bell"></i> Alert: <span id="event-alert">15 minutes before</span></div>
+                    <div><i class="fas fa-repeat"></i> Recurrence: <span id="event-recurrence">None</span></div>
+                </div>
+                <div class="event-actions">
+                    <button class="btn" id="edit-event-btn">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-secondary" id="close-details-btn">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        Made with LOVE | by SAJANI KUMARI 💞🫶🏻
+    </footer>
+
+    <script>
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            if (!token || !user) {
+                alert('Please login to access the calendar.');
+                window.location.href = 'index.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Check authentication on page load
+        if (!checkAuthentication()) {
+            // Page will redirect, stop execution
+        } else {
+            // DOM Elements
+            const calendarGrid = document.querySelector('.calendar-grid');
+            const currentMonthEl = document.getElementById('current-month');
+            const prevMonthBtn = document.getElementById('prev-month');
+            const nextMonthBtn = document.getElementById('next-month');
+        const addEventBtn = document.getElementById('add-event-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const eventModal = document.getElementById('event-modal');
+        const closeModal = document.getElementById('close-modal');
+        const closeDetailsBtn = document.getElementById('close-details-btn');
+        const editEventBtn = document.getElementById('edit-event-btn');
+        const eventTitleEl = document.getElementById('event-title');
+        const eventTimeEl = document.getElementById('event-time');
+        const eventDescriptionEl = document.getElementById('event-description');
+        const eventAlertEl = document.getElementById('event-alert');
+        const eventRecurrenceEl = document.getElementById('event-recurrence');
+
+        // Calendar state
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+
+        // Initialize the calendar
+        function initCalendar() {
+            renderCalendar(currentMonth, currentYear);
+            loadAndDisplayReminders();
+        }
+
+        // Render calendar for specific month and year
+        function renderCalendar(month, year) {
+            // Clear existing days except headers
+            const headers = Array.from(calendarGrid.querySelectorAll('.calendar-day-header'));
+            calendarGrid.innerHTML = '';
+            headers.forEach(header => calendarGrid.appendChild(header));
+
+            // Set current month display
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            currentMonthEl.textContent = `${monthNames[month]} ${year}`;
+
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Get the day of the week for the first day (0 = Sunday, 1 = Monday, etc)
+            const firstDayIndex = firstDay.getDay();
+
+            // Create empty cells for days before the first day
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                calendarGrid.appendChild(emptyDay);
+            }
+
+            // Create cells for each day of the month
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+
+                // Add day number
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = i;
+                dayElement.appendChild(dayNumber);
+
+                // Add events container
+                const eventList = document.createElement('div');
+                eventList.className = 'event-list';
+                eventList.id = `events-${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                dayElement.appendChild(eventList);
+
+                // Highlight today
+                if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayElement.classList.add('today');
+                }
+
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        // Load reminders from backend and display on calendar
+        async function loadAndDisplayReminders() {
+            let reminders = [];
+
+            try {
+                // Try to load from backend first
+                const token = localStorage.getItem('token');
+                if (token) {
+                    console.log('📡 Loading reminders from backend for calendar...');
+                    const response = await fetch('http://localhost:5000/api/reminders', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        reminders = await response.json();
+                        console.log('✅ Loaded', reminders.length, 'reminders from backend');
+
+                        // Update localStorage backup
+                        localStorage.setItem('innerself_reminders', JSON.stringify(reminders));
+                    } else {
+                        throw new Error(`Backend error: ${response.status}`);
+                    }
+                } else {
+                    throw new Error('No authentication token');
+                }
+            } catch (error) {
+                console.warn('⚠️ Failed to load from backend:', error.message);
+                console.log('📱 Falling back to localStorage...');
+
+                // Fallback to localStorage
+                reminders = JSON.parse(localStorage.getItem('innerself_reminders')) || [];
+            }
+
+            console.log('📅 Loading reminders for calendar:', reminders.length, 'reminders found');
+
+            // Show message if no reminders
+            if (reminders.length === 0) {
+                console.log('📅 No reminders found. You can:');
+                console.log('1. Go to Reminders page to create some');
+                console.log('2. Press Ctrl+Shift+S to create sample reminders');
+
+                // Add a visual indicator on the calendar
+                const calendarGrid = document.querySelector('.calendar-grid');
+                let noDataMessage = document.getElementById('no-reminders-message');
+                if (!noDataMessage) {
+                    noDataMessage = document.createElement('div');
+                    noDataMessage.id = 'no-reminders-message';
+                    noDataMessage.style.cssText = `
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        text-align: center;
+                        color: #8B4513;
+                        font-size: 16px;
+                        background: rgba(255, 255, 255, 0.9);
+                        padding: 20px;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                        z-index: 10;
+                    `;
+                    noDataMessage.innerHTML = `
+                        <i class="fas fa-calendar-plus" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                        <strong>No reminders yet!</strong><br>
+                        <small>Go to <a href="reminders.html" style="color: #8B4513;">Reminders</a> to create some<br>
+                        or press <kbd>Ctrl+Shift+S</kbd> for sample data</small>
+                    `;
+                    calendarGrid.parentElement.style.position = 'relative';
+                    calendarGrid.parentElement.appendChild(noDataMessage);
+                }
+                return;
+            } else {
+                // Remove no data message if it exists
+                const noDataMessage = document.getElementById('no-reminders-message');
+                if (noDataMessage) {
+                    noDataMessage.remove();
+                }
+            }
+
+            // Clear existing events from display
+            document.querySelectorAll('.event-list').forEach(el => {
+                el.innerHTML = '';
+            });
+
+            // Process and display each reminder
+            reminders.forEach((reminder, index) => {
+                try {
+                    const eventDate = new Date(reminder.datetime);
+
+                    // Validate date
+                    if (isNaN(eventDate.getTime())) {
+                        console.warn(`⚠️ Invalid date for reminder ${index}:`, reminder.datetime);
+                        return;
+                    }
+
+                    const dateKey = `${eventDate.getFullYear()}-${String(eventDate.getMonth() + 1).padStart(2, '0')}-${String(eventDate.getDate()).padStart(2, '0')}`;
+                    console.log(`📅 Processing reminder "${reminder.title}" for date: ${dateKey}`);
+
+                    const eventContainer = document.getElementById(`events-${dateKey}`);
+                    if (eventContainer) {
+                        const eventItem = document.createElement('div');
+                        eventItem.className = 'event-item';
+                        eventItem.dataset.id = reminder._id || reminder.id;
+                        eventItem.innerHTML = `
+                            <div class="event-color" style="background-color: ${reminder.color || '#ff6b6b'}"></div>
+                            <div class="event-time">${formatTime(eventDate)}</div>
+                            <div class="event-title">${reminder.title || 'Untitled'}</div>
+                        `;
+
+                        eventItem.addEventListener('click', () => {
+                            showEventDetails(reminder);
+                        });
+
+                        eventContainer.appendChild(eventItem);
+                        console.log(`✅ Added event "${reminder.title}" to calendar`);
+                    } else {
+                        console.warn(`⚠️ Event container not found for date: events-${dateKey}`);
+                        console.log('Available containers:', Array.from(document.querySelectorAll('.event-list')).map(el => el.id));
+                    }
+                } catch (error) {
+                    console.error(`❌ Error processing reminder ${index}:`, error, reminder);
+                }
+            });
+
+            console.log('📅 Calendar loading complete');
+        }
+
+        // Format time for display (HH:MM AM/PM)
+        function formatTime(date) {
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return `${hours}:${minutes} ${ampm}`;
+        }
+
+        // Show event details modal
+        function showEventDetails(reminder) {
+            const eventDate = new Date(reminder.datetime);
+            const formattedDate = eventDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const formattedTime = formatTime(eventDate);
+
+            eventTitleEl.textContent = reminder.title;
+            eventTimeEl.textContent = `${formattedDate} at ${formattedTime}`;
+            eventDescriptionEl.textContent = reminder.description || 'No description';
+            eventAlertEl.textContent = `${reminder.preAlert} minutes before`;
+            eventRecurrenceEl.textContent = reminder.recurring.charAt(0).toUpperCase() + reminder.recurring.slice(1);
+
+            // Set modal border color
+            document.getElementById('modal-content').style.borderTopColor = reminder.color;
+
+            // Set edit button to open reminders page
+            editEventBtn.onclick = function() {
+                window.location.href = `reminders.html?edit=${reminder._id || reminder.id}`;
+            };
+
+            // Show modal
+            eventModal.style.display = 'flex';
+        }
+
+        // Event Listeners
+        prevMonthBtn.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar(currentMonth, currentYear);
+            loadAndDisplayReminders();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar(currentMonth, currentYear);
+            loadAndDisplayReminders();
+        });
+
+        addEventBtn.addEventListener('click', () => {
+            window.location.href = 'reminders.html';
+        });
+
+        refreshBtn.addEventListener('click', () => {
+            loadAndDisplayReminders();
+        });
+
+        closeModal.addEventListener('click', () => {
+            eventModal.style.display = 'none';
+        });
+
+        closeDetailsBtn.addEventListener('click', () => {
+            eventModal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === eventModal) {
+                eventModal.style.display = 'none';
+            }
+
+        // Subtle ripple binding
+        (function(){
+            const rippleTargets = document.querySelectorAll('.btn, .nav-btn');
+            rippleTargets.forEach(btn => btn.addEventListener('click', function(e){
+                const r = this.getBoundingClientRect();
+                const x = (e.clientX||r.width/2) - r.left;
+                const y = (e.clientY||r.height/2) - r.top;
+                const s = document.createElement('span'); s.className='ripple';
+                const size = Math.max(r.width, r.height);
+                s.style.width = s.style.height = size + 'px'; s.style.left = x + 'px'; s.style.top = y + 'px';
+                this.appendChild(s); s.addEventListener('animationend', ()=> s.remove());
+            }));
+        })();
+
+        });
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        });
+
+        // Test function to create sample reminders (for debugging)
+        function createSampleReminders() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+
+            const sampleReminders = [
+                {
+                    id: 'sample-1',
+                    title: 'Team Meeting',
+                    description: 'Weekly team sync',
+                    datetime: today.toISOString().slice(0, 16),
+                    color: '#4CAF50',
+                    preAlert: 15,
+                    recurring: 'none'
+                },
+                {
+                    id: 'sample-2',
+                    title: 'Doctor Appointment',
+                    description: 'Annual checkup',
+                    datetime: tomorrow.toISOString().slice(0, 16),
+                    color: '#2196F3',
+                    preAlert: 30,
+                    recurring: 'none'
+                }
+            ];
+
+            localStorage.setItem('innerself_reminders', JSON.stringify(sampleReminders));
+            console.log('📅 Sample reminders created');
+            loadAndDisplayReminders();
+        }
+
+        // Add keyboard shortcut to create sample data (Ctrl+Shift+S)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+                createSampleReminders();
+                alert('Sample reminders created! Check the calendar.');
+            }
+        });
+
+        // Initialize the calendar
+        initCalendar();
+
+        } // End of authentication check
+    </script>
+</body>
+</html>
