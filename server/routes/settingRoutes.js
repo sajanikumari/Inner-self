@@ -1,5 +1,5 @@
 const express = require('express');
-const Setting = require('../models/Setting');
+const Setting = require('../models/setting');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 
