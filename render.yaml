@@ -1,10 +1,9 @@
 services:
   - type: web
     name: inner-self-backend
-    env: node
+    env: docker
     plan: free
-    buildCommand: "cd server && npm install"
-    startCommand: "cd server && node index.js"
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: NODE_ENV
         value: production

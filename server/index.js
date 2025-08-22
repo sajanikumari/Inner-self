@@ -84,6 +84,13 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   
   // Initialize reminder scheduler after server starts to avoid circular dependency
-  const { scheduleReminders } = require('./utils/reminderScheduler');
-  scheduleReminders();
+  try {
+    const { scheduleReminders } = require('./utils/reminderScheduler');
+    scheduleReminders();
+    console.log('✅ Reminder scheduler loaded successfully');
+  } catch (error) {
+    console.error('❌ Failed to load reminder scheduler:', error.message);
+    console.error('Stack trace:', error.stack);
+    // Continue without scheduler rather than crashing
+  }
 });
