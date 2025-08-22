@@ -207,8 +207,7 @@ Comprehensive settings panel for profile and account management.
 
 ## 👥 Authors
 
-- **Sajani Kumari** - *Initial work and design*
-- **Development Team** - *Feature implementation*
+- **Sajani Kumari**
 
 ## 🙏 Acknowledgments
 
