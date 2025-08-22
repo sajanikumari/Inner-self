@@ -26,8 +26,9 @@ USER nodejs
 # Set working directory to server
 WORKDIR /app/server
 
-# Expose port
+# Expose the ports that might be used
 EXPOSE 5000
+EXPOSE 10000
 
 # Start the server
 CMD ["node", "index.js"]
