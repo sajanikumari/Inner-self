@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: inner-self-backend
+    env: node
+    plan: free
+    buildCommand: "cd server && npm ci"
+    startCommand: "cd server && node index.js"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000

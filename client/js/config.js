@@ -2,8 +2,9 @@
 const API_CONFIG = {
     // Detect environment and use appropriate backend URL
     BASE_URL: (() => {
-        // Check if we're on GitHub Pages
-        if (window.location.hostname.includes('github.io')) {
+        // Check if we're on GitHub Pages or production
+        if (window.location.hostname.includes('github.io') || 
+            window.location.hostname.includes('sajanikumari.github.io')) {
             // Production backend URL - LIVE BACKEND
             return 'https://inner-self-backend.onrender.com/api';
         }

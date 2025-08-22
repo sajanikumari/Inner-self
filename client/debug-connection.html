@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Connection - Inner Self</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Inner Self - Connection Debug Tool</h1>
+        
+        <div class="status info">
+            <h3>Current Environment Info:</h3>
+            <p><strong>Current URL:</strong> <span id="currentUrl"></span></p>
+            <p><strong>Hostname:</strong> <span id="hostname"></span></p>
+            <p><strong>Protocol:</strong> <span id="protocol"></span></p>
+            <p><strong>Detected Backend URL:</strong> <span id="backendUrl"></span></p>
+        </div>
+
+        <div class="actions">
+            <button onclick="testBackendConnection()">🔗 Test Backend Connection</button>
+            <button onclick="testSpecificEndpoint()">🎯 Test Auth Endpoint</button>
+            <button onclick="checkCORS()">🌐 Check CORS</button>
+            <button onclick="clearResults()">🧹 Clear Results</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        // Display current environment info
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('hostname').textContent = window.location.hostname;
+        document.getElementById('protocol').textContent = window.location.protocol;
+        document.getElementById('backendUrl').textContent = API_CONFIG.BASE_URL;
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testBackendConnection() {
+            addResult('🔄 Testing basic backend connection...', 'info');
+            
+            try {
+                const response = await fetch('https://inner-self-backend.onrender.com/', {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    addResult(`✅ Backend is reachable!<br><strong>Status:</strong> ${response.status}<br><strong>Response:</strong> ${text}`, 'success');
+                } else {
+                    addResult(`⚠️ Backend responded with status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Failed to connect to backend<br><strong>Error:</strong> ${error.message}`, 'error');
+            }
+        }
+
+        async function testSpecificEndpoint() {
+            addResult('🔄 Testing API auth endpoint...', 'info');
+            
+            try {
+                const response = await fetch(API_CONFIG.BASE_URL + '/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'testpassword'
+                    })
+                });
+                
+                const data = await response.json();
+                addResult(`📡 API Endpoint Response<br><strong>Status:</strong> ${response.status}<br><strong>Response:</strong><pre>${JSON.stringify(data, null, 2)}</pre>`, 
+                    response.ok ? 'success' : 'error');
+            } catch (error) {
+                addResult(`❌ API endpoint test failed<br><strong>Error:</strong> ${error.message}`, 'error');
+            }
+        }
+
+        async function checkCORS() {
+            addResult('🔄 Testing CORS configuration...', 'info');
+            
+            try {
+                const response = await fetch(API_CONFIG.BASE_URL + '/auth/login', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers')
+                };
+                
+                addResult(`🌐 CORS Check Results<br><strong>Status:</strong> ${response.status}<br><strong>CORS Headers:</strong><pre>${JSON.stringify(corsHeaders, null, 2)}</pre>`, 
+                    response.ok ? 'success' : 'error');
+            } catch (error) {
+                addResult(`❌ CORS check failed<br><strong>Error:</strong> ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testBackendConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
