@@ -25,22 +25,33 @@ router.post('/login', async (req, res) => {
         }
 
         // Find user in database
+        console.log(`🔍 Looking for user with email: ${email.toLowerCase()}`);
         const user = await User.findOne({ email: email.toLowerCase() });
         if (!user) {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Invalid email or password' 
+            console.log(`❌ User not found for email: ${email.toLowerCase()}`);
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
             });
         }
 
+        console.log(`✅ User found: ${user.email}, ID: ${user._id}`);
+        console.log(`🔐 Stored password hash length: ${user.password ? user.password.length : 'undefined'}`);
+        console.log(`🔑 Provided password length: ${password ? password.length : 'undefined'}`);
+
         // Verify password
         const isPasswordValid = await bcrypt.compare(password, user.password);
+        console.log(`🔓 Password validation result: ${isPasswordValid}`);
+
         if (!isPasswordValid) {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Invalid email or password' 
+            console.log(`❌ Password validation failed for user: ${user.email}`);
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
             });
         }
+
+        console.log(`✅ Login successful for user: ${user.email}`);
 
         // Generate token
         const token = generateToken(user._id);
@@ -107,6 +118,9 @@ router.post('/signup', async (req, res) => {
         }
 
         // Create new user (password will be hashed automatically by the model)
+        console.log(`🔄 Creating new user: ${email.toLowerCase()}`);
+        console.log(`🔑 Original password length: ${password.length}`);
+
         const user = new User({
             name: name.trim(),
             username: username.toLowerCase().trim(),
@@ -115,6 +129,9 @@ router.post('/signup', async (req, res) => {
         });
 
         await user.save();
+
+        console.log(`✅ User created successfully: ${user.email}`);
+        console.log(`🔐 Hashed password length: ${user.password ? user.password.length : 'undefined'}`);
 
         // Generate token
         const token = generateToken(user._id);

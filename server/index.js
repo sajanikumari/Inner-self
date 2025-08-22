@@ -7,7 +7,7 @@ const WebSocket = require('ws');
 
 const app = express();
 
-// CORS Configuration
+// CORS Configuration - More permissive for debugging
 const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
@@ -32,31 +32,85 @@ const corsOptions = {
       console.log('✅ CORS: Origin allowed');
       callback(null, true);
     } else {
-      console.log('❌ CORS: Origin not allowed');
-      callback(new Error('Not allowed by CORS'));
+      console.log('❌ CORS: Origin not allowed:', origin);
+      // For debugging, allow all origins temporarily
+      console.log('⚠️  Allowing origin for debugging purposes');
+      callback(null, true);
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Accept',
+    'Origin',
+    'X-Requested-With',
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Headers',
+    'Access-Control-Allow-Methods'
+  ],
   credentials: true,
   optionsSuccessStatus: 200,
   preflightContinue: false
 };
 
-// Middleware
+// Apply CORS middleware first
 app.use(cors(corsOptions));
 
-// Explicit preflight handling
+// Additional CORS headers middleware for extra safety
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  // Set CORS headers explicitly
+  if (origin && (origin.includes('sajanikumari.github.io') || origin.includes('localhost'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    console.log('🔄 Handling preflight request for:', req.url);
+    return res.status(200).end();
+  }
+
+  next();
+});
+
+// Explicit preflight handling for all routes
 app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(fileUpload());
 
-// Request logging with CORS debug
+// Enhanced request logging with CORS debug
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   console.log(`Origin: ${req.headers.origin}`);
-  console.log(`CORS Headers: ${JSON.stringify(req.headers)}`);
+
+  // Log important headers for CORS debugging
+  const corsHeaders = {
+    'origin': req.headers.origin,
+    'access-control-request-method': req.headers['access-control-request-method'],
+    'access-control-request-headers': req.headers['access-control-request-headers'],
+    'user-agent': req.headers['user-agent']
+  };
+  console.log(`CORS Debug Headers:`, corsHeaders);
+
+  // Log response headers being sent
+  const originalSend = res.send;
+  res.send = function(data) {
+    console.log(`Response Headers for ${req.method} ${req.url}:`, {
+      'access-control-allow-origin': res.get('Access-Control-Allow-Origin'),
+      'access-control-allow-methods': res.get('Access-Control-Allow-Methods'),
+      'access-control-allow-headers': res.get('Access-Control-Allow-Headers'),
+      'access-control-allow-credentials': res.get('Access-Control-Allow-Credentials')
+    });
+    originalSend.call(this, data);
+  };
+
   next();
 });
 
