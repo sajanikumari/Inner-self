@@ -7,26 +7,47 @@ const WebSocket = require('ws');
 
 const app = express();
 
-// Middleware
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5000', 
-    'http://127.0.0.1:5500',
-    'https://sajanikumari.github.io',
-    'https://sajanikumari.github.io/Inner-self',
-    'https://sajanikumari.github.io/Inner-self/client',
-    'https://sajanikumari.github.io/Inner-self/client/index.html'
-  ],
+// CORS Configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5000',
+      'http://127.0.0.1:5500',
+      'https://sajanikumari.github.io',
+      'https://sajanikumari.github.io/Inner-self',
+      'https://sajanikumari.github.io/Inner-self/client',
+      'https://sajanikumari.github.io/Inner-self/client/index.html'
+    ];
+
+    console.log(`🔍 CORS Check - Origin: ${origin}`);
+
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      console.log('✅ CORS: No origin header, allowing request');
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      console.log('✅ CORS: Origin allowed');
+      callback(null, true);
+    } else {
+      console.log('❌ CORS: Origin not allowed');
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
   credentials: true,
-  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
-  preflightContinue: false // Pass control to the next handler
-}));
+  optionsSuccessStatus: 200,
+  preflightContinue: false
+};
+
+// Middleware
+app.use(cors(corsOptions));
 
 // Explicit preflight handling
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(fileUpload());
@@ -83,48 +104,57 @@ const connectDB = async () => {
 
 connectDB();
 
+// Test route
+app.get('/', (req, res) => {
+  res.send('InnerSelf Buddy backend is running!');
+});
+
+// CORS test endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'CORS is working!',
+    origin: req.headers.origin,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
+const http = require('http');
+const server = http.createServer(app);
+
 // WebSocket - use same server instance to avoid port conflicts
 let wss;
 try {
-  const http = require('http');
-  const server = http.createServer(app);
-  
-  // Use the same port as the HTTP server
+  // Use the same server instance for WebSocket
   wss = new WebSocket.Server({ server });
-  
+
   wss.on('connection', (ws) => {
     console.log('New WebSocket connection established');
     ws.on('message', (message) => {
       // Handle messages
       console.log('Received:', message);
     });
-    
+
     ws.on('close', () => {
       console.log('WebSocket connection closed');
     });
   });
-  
+
   console.log('✅ WebSocket server initialized');
 } catch (err) {
   console.error('❌ WebSocket server error:', err.message);
   // Continue without WebSocket rather than crashing
 }
 
-
 // Export wss for use in other modules
 module.exports = { wss };
 
-// Test route
-app.get('/', (req, res) => {
-  res.send('InnerSelf Buddy backend is running!');
-});
-
-// Start server
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-  
+
   // Initialize reminder scheduler after server starts to avoid circular dependency
   try {
     const { scheduleReminders } = require('./utils/reminderScheduler');
