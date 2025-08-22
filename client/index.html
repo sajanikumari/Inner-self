@@ -1621,23 +1621,25 @@
 
 
 
-    <script src="js/config.js"></script>
+    <!-- Bust cache to ensure latest config is loaded on GitHub Pages -->
+    <script src="js/config.js?v=20250822"></script>
     <script>
         // Define the getApiUrl helper function
         function getApiUrl(endpoint) {
             console.log('🔗 Getting API URL for endpoint:', endpoint);
-            if (!API_CONFIG) {
-                console.error('⚠️ API_CONFIG not found! Using fallback URL.');
-                return 'https://inner-self-backend.onrender.com/api' + endpoint;
-            }
-            
+            // Force production backend to avoid localhost usage in deployed site
+            const FORCED_BASE = 'https://inner-self-backend.onrender.com/api';
             try {
-                const fullUrl = API_CONFIG.BASE_URL + endpoint;
+                const baseFromConfig = (typeof API_CONFIG !== 'undefined' && API_CONFIG && API_CONFIG.BASE_URL) ? API_CONFIG.BASE_URL : FORCED_BASE;
+                const finalBase = FORCED_BASE; // enforce production base explicitly
+                const fullUrl = finalBase + endpoint;
+                console.log('📍 BASE (config):', baseFromConfig);
+                console.log('📍 BASE (forced):', finalBase);
                 console.log('📍 Full API URL:', fullUrl);
                 return fullUrl;
             } catch (err) {
                 console.error('⚠️ Error building API URL:', err);
-                return 'https://inner-self-backend.onrender.com/api' + endpoint;
+                return FORCED_BASE + endpoint;
             }
         }
         // DOM elements
@@ -1758,28 +1760,35 @@ async function login() {
         });
 
         console.log('📥 Got response:', response.status);
-        const data = await response.json();
-        console.log('📦 Response data:', data);
+        const raw = await response.json();
+        console.log('📦 Response data:', raw);
 
-        if (response.ok && data.success) {
-            console.log('✅ Login successful for:', data.data.user.name);
+        // Normalize shape whether backend sends {success,data:{user,token}} or {user,token}
+        const ok = response.ok && (raw && (raw.success === undefined || raw.success === true));
+        const payload = raw && raw.data ? raw.data : raw;
+        const user = payload ? payload.user : undefined;
+        const token = payload ? payload.token : undefined;
+
+        if (ok && user) {
+            console.log('✅ Login successful for:', user.name || user.email || '(no-name)');
 
             // Save token and user data
-            localStorage.setItem('token', data.data.token);
-            localStorage.setItem('user', JSON.stringify(data.data.user));
+            if (token) localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
 
             // Hide form
             hideForm();
 
             // Redirect to app page
-            showAppPage(data.data.user.name);
+            showAppPage(user.name || user.email || 'User');
 
             // Clear form
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
         } else {
-            console.log('❌ Login failed:', data.message);
-            alert(data.message || 'Login failed. Please check your credentials.');
+            const msg = (raw && (raw.message || raw.error)) || 'Login failed. Please check your credentials.';
+            console.log('❌ Login failed:', msg);
+            alert(msg);
         }
     } catch (error) {
         console.error('❌ Login network error:', error);
