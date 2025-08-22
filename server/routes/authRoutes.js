@@ -21,12 +21,15 @@ router.post('/login', async (req, res) => {
         console.log(`📧 Email: ${email}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
 
         // Validation
+        console.log('🔍 Validating login fields...');
         if (!email || !password) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Email and password are required' 
+            console.log('❌ Missing email or password');
+            return res.status(400).json({
+                success: false,
+                message: 'Email and password are required'
             });
         }
+        console.log('✅ Login validation passed');
 
         // Find user in database
         console.log(`🔍 Looking for user with email: ${email.toLowerCase()}`);
