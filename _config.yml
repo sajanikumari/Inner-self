@@ -1,10 +1,11 @@
 ﻿name: Inner-self
 theme: jekyll-theme-primer
+
 exclude:
   - server/
   - server/**
   - node_modules/
-  - **/node_modules/**
+  - "**/node_modules/**"
   - scripts/
   - .github/
   - .git/
@@ -17,5 +18,6 @@ exclude:
   - LICENSE
   - Dockerfile
   - docker-compose.yml
+
 include:
   - client/
