@@ -1621,6 +1621,7 @@
 
 
 
+    <script src="js/config.js"></script>
     <script>
         // DOM elements
         const landingPage = document.getElementById('landing-page');
@@ -1730,7 +1731,7 @@ async function login() {
 
     try {
         console.log('🔄 Attempting login for:', username);
-        const response = await fetch('http://localhost:5000/api/auth/login',  {
+        const response = await fetch(getApiUrl('/auth/login'),  {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -1788,7 +1789,7 @@ async function signup() {
     }
 
     try {
-        const response = await fetch('http://localhost:5000/api/auth/signup', {
+        const response = await fetch(getApiUrl('/auth/signup'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, username, email, password })
@@ -1898,7 +1899,7 @@ async function signup() {
             if (existingUser && token) {
                 try {
                     // Verify token is still valid by making a request to the backend
-                    const response = await fetch('http://localhost:5000/api/auth/me', {
+                    const response = await fetch(getApiUrl('/auth/me'), {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
 
@@ -2018,7 +2019,7 @@ async function signup() {
                         return this.getDefaultTasks();
                     }
 
-                    const response = await fetch('http://localhost:5000/api/tasks', {
+                    const response = await fetch(getApiUrl('/tasks'), {
                         headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json'
@@ -2076,7 +2077,7 @@ async function signup() {
                     const token = localStorage.getItem('token');
                     if (!token) throw new Error('No auth token');
 
-                    const response = await fetch('http://localhost:5000/api/tasks', {
+                    const response = await fetch(getApiUrl('/tasks'), {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -2103,7 +2104,7 @@ async function signup() {
                     const token = localStorage.getItem('token');
                     if (!token) throw new Error('No auth token');
 
-                    const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+                    const response = await fetch(`${getApiUrl('/tasks')}/${taskId}`, {
                         method: 'PUT',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -2130,7 +2131,7 @@ async function signup() {
                     const token = localStorage.getItem('token');
                     if (!token) throw new Error('No auth token');
 
-                    const response = await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+                    const response = await fetch(`${getApiUrl('/tasks')}/${taskId}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -2556,14 +2557,14 @@ function stopRecording() {
     formData.append('audio', audioBlob, 'recording.wav');
 
     try {
-      const response = await fetch('/api/voice/upload', {
+      const response = await fetch(getApiUrl('/voice/upload'), {
         method: 'POST',
         body: formData
       });
       const { url } = await response.json();
 
       // Convert to text
-      const textResponse = await fetch('/api/voice/transcribe', {
+      const textResponse = await fetch(getApiUrl('/voice/transcribe'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ audioUrl: url })
