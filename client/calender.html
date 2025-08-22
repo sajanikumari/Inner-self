@@ -705,7 +705,7 @@
                 const token = localStorage.getItem('token');
                 if (token) {
                     console.log('📡 Loading reminders from backend for calendar...');
-                    const response = await fetch('http://localhost:5000/api/reminders', {
+                    const response = await fetch(getApiUrl('/reminders'), {
                         headers: {
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json'

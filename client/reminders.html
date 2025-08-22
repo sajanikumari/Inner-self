@@ -837,7 +837,7 @@
                 }
             };
 
-            const response = await fetch(`http://localhost:5000/api/reminders${url}`, {
+            const response = await fetch(`${getApiUrl('/reminders')}${url}`, {
                 ...defaultOptions,
                 ...options,
                 headers: { ...defaultOptions.headers, ...options.headers }

@@ -978,7 +978,7 @@
                     return;
                 }
 
-                const response = await fetch('http://localhost:5000/api/diary', {
+                const response = await fetch(getApiUrl('/diary'), {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -2018,7 +2018,7 @@
                 // Delete from backend if possible
                 const token = localStorage.getItem('token');
                 if (token) {
-                    const response = await fetch(`http://localhost:5000/api/diary/${actualId}`, {
+                    const response = await fetch(`${getApiUrl('/diary')}/${actualId}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`,
