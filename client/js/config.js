@@ -4,8 +4,8 @@ const API_CONFIG = {
     BASE_URL: (() => {
         // Check if we're on GitHub Pages
         if (window.location.hostname.includes('github.io')) {
-            // Production backend URL - UPDATE THIS after deploying backend
-            return 'https://your-backend-app.onrender.com/api';
+            // Production backend URL - REPLACE WITH YOUR ACTUAL BACKEND URL
+            return 'https://your-actual-backend-url.onrender.com/api';
         }
         // Development - local backend
         return 'http://localhost:5000/api';
