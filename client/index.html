@@ -1623,6 +1623,23 @@
 
     <script src="js/config.js"></script>
     <script>
+        // Define the getApiUrl helper function
+        function getApiUrl(endpoint) {
+            console.log('🔗 Getting API URL for endpoint:', endpoint);
+            if (!API_CONFIG) {
+                console.error('⚠️ API_CONFIG not found! Using fallback URL.');
+                return 'https://inner-self-backend.onrender.com/api' + endpoint;
+            }
+            
+            try {
+                const fullUrl = API_CONFIG.BASE_URL + endpoint;
+                console.log('📍 Full API URL:', fullUrl);
+                return fullUrl;
+            } catch (err) {
+                console.error('⚠️ Error building API URL:', err);
+                return 'https://inner-self-backend.onrender.com/api' + endpoint;
+            }
+        }
         // DOM elements
         const landingPage = document.getElementById('landing-page');
         const appPage = document.getElementById('app-page');
@@ -1734,10 +1751,15 @@ async function login() {
         const response = await fetch(getApiUrl('/auth/login'),  {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ 
+                email: username,  // Backend expects 'email' not 'username'
+                password: password
+            })
         });
 
+        console.log('📥 Got response:', response.status);
         const data = await response.json();
+        console.log('📦 Response data:', data);
 
         if (response.ok) {
             console.log('✅ Login successful for:', data.user.name);
