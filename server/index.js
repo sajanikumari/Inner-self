@@ -15,21 +15,27 @@ app.use(cors({
     'http://127.0.0.1:5500',
     'https://sajanikumari.github.io',
     'https://sajanikumari.github.io/Inner-self',
-    'https://sajanikumari.github.io/Inner-self/client'
+    'https://sajanikumari.github.io/Inner-self/client',
+    'https://sajanikumari.github.io/Inner-self/client/index.html'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+  credentials: true,
+  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+  preflightContinue: false // Pass control to the next handler
 }));
+
+// Explicit preflight handling
+app.options('*', cors());
+
 app.use(express.json());
 app.use(fileUpload());
 
-// Handle preflight requests
-app.options('*', cors());
-
-// Request logging
+// Request logging with CORS debug
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log(`Origin: ${req.headers.origin}`);
+  console.log(`CORS Headers: ${JSON.stringify(req.headers)}`);
   next();
 });
 
