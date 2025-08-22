@@ -13,8 +13,12 @@ const generateToken = (userId) => {
 
 // LOGIN - Validate existing users only
 router.post('/login', async (req, res) => {
+    console.log('🚀 LOGIN route hit');
+    console.log('📦 Request body:', req.body);
+
     try {
         const { email, password } = req.body;
+        console.log(`📧 Email: ${email}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
 
         // Validation
         if (!email || !password) {
@@ -83,8 +87,12 @@ router.post('/login', async (req, res) => {
 
 // SIGNUP - Create new user account
 router.post('/signup', async (req, res) => {
+    console.log('🚀 SIGNUP route hit');
+    console.log('📦 Request body:', req.body);
+
     try {
         const { name, username, email, password } = req.body;
+        console.log(`📧 Email: ${email}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
 
         // Validation
         if (!name || !username || !email || !password) {
