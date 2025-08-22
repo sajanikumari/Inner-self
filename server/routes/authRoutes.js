@@ -8,7 +8,14 @@ router.post('/login', async (req, res) => {
         res.json({ 
             success: true, 
             message: 'Login endpoint ready - authentication logic needed',
-            data: { user: 'test@example.com' }
+            data: { 
+                user: {
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    id: 'temp-user-id'
+                },
+                token: 'temporary-jwt-token'
+            }
         });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
