@@ -4,7 +4,6 @@ A beautiful, full-featured personal wellness application that helps you track yo
 
 ![InnerSelf Buddy](https://img.shields.io/badge/Status-Active-brightgreen)
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ## ✨ Features
 
