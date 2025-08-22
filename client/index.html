@@ -1761,18 +1761,18 @@ async function login() {
         const data = await response.json();
         console.log('📦 Response data:', data);
 
-        if (response.ok) {
-            console.log('✅ Login successful for:', data.user.name);
+        if (response.ok && data.success) {
+            console.log('✅ Login successful for:', data.data.user.name);
 
             // Save token and user data
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.data.token);
+            localStorage.setItem('user', JSON.stringify(data.data.user));
 
             // Hide form
             hideForm();
 
             // Redirect to app page
-            showAppPage(data.user.name);
+            showAppPage(data.data.user.name);
 
             // Clear form
             document.getElementById('username').value = '';
