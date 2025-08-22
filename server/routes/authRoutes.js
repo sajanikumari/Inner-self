@@ -121,11 +121,15 @@ router.post('/signup', async (req, res) => {
         console.log(`🔄 Creating new user: ${email.toLowerCase()}`);
         console.log(`🔑 Original password length: ${password.length}`);
 
+        // Manual password hashing as backup (in case pre-save middleware fails)
+        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log(`🔐 Manually hashed password length: ${hashedPassword.length}`);
+
         const user = new User({
             name: name.trim(),
             username: username.toLowerCase().trim(),
             email: email.toLowerCase().trim(),
-            password: password
+            password: hashedPassword  // Use manually hashed password
         });
 
         await user.save();
