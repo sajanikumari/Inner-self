@@ -16,53 +16,37 @@ const generateToken = (userId) => {
 
 // LOGIN - Validate existing users only
 router.post('/login', async (req, res) => {
-    console.log('🚀 LOGIN route hit');
-    console.log('📦 Request body:', req.body);
-
     try {
         const { username, password } = req.body;
         const usernameNorm = (username || '').toLowerCase().trim();
         const passwordNorm = (password || '').trim();
-        console.log(`👤 Username (raw): ${username} -> (norm): ${usernameNorm}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
 
         // Validation
-        console.log('🔍 Validating login fields...');
         if (!usernameNorm || !passwordNorm) {
-            console.log('❌ Missing username or password');
             return res.status(400).json({
                 success: false,
                 message: 'Username and password are required'
             });
         }
-        console.log('✅ Login validation passed');
 
         // Find user in database
-        console.log(`🔍 Looking for user with username: ${usernameNorm}`);
         const user = await User.findOne({ username: usernameNorm });
         if (!user) {
-            console.log(`❌ User not found for username: ${usernameNorm}`);
             return res.status(401).json({
                 success: false,
                 message: 'Invalid username or password'
             });
         }
-
-        console.log(`✅ User found: ${user.username}, ID: ${user._id}`);
-        console.log(`🔐 Stored password hash length: ${user.password ? user.password.length : 'undefined'}`);
-        console.log(`🔑 Provided password length: ${passwordNorm ? passwordNorm.length : 'undefined'}`);
 
         // Verify password
         const isPasswordValid = await bcrypt.compare(passwordNorm, user.password);
 
         if (!isPasswordValid) {
-            console.log(`❌ Password validation failed for user: ${user.username}`);
             return res.status(401).json({
                 success: false,
                 message: 'Invalid username or password'
             });
         }
-
-        console.log(`✅ Login successful for user: ${user.username}`);
 
         // Generate token
         const token = generateToken(user._id);
@@ -76,8 +60,6 @@ router.post('/login', async (req, res) => {
             avatar: user.avatar,
             bio: user.bio
         };
-
-        console.log('✅ User logged in successfully:', user.username);
 
         res.json({
             success: true,
@@ -94,23 +76,16 @@ router.post('/login', async (req, res) => {
 
 // SIGNUP - Create new user account
 router.post('/signup', async (req, res) => {
-    console.log('🚀 SIGNUP route hit');
-    console.log('📦 Request body:', req.body);
-
     try {
         const { name, username, email, password } = req.body;
-        console.log(`📧 Email: ${email}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
 
         // Validation
-        console.log('🔍 Validating signup fields...');
         if (!name || !username || !email || !password) {
-            console.log('❌ Missing required fields:', { name: !!name, username: !!username, email: !!email, password: !!password });
             return res.status(400).json({
                 success: false,
                 message: 'All fields are required'
             });
         }
-        console.log('✅ Signup validation passed');
 
         if (password.length < 6) {
             return res.status(400).json({
@@ -136,10 +111,6 @@ router.post('/signup', async (req, res) => {
         }
 
         // Create new user (password will be hashed automatically by the model)
-        console.log(`🔄 Creating new user: ${email.toLowerCase()}`);
-        console.log(`🔑 Original password length: ${password.length}`);
-
-        // Create user with raw password; model pre-save hook will hash it
         const user = new User({
             name: name.trim(),
             username: username.toLowerCase().trim(),
@@ -148,9 +119,6 @@ router.post('/signup', async (req, res) => {
         });
 
         await user.save();
-
-        console.log(`✅ User created successfully: ${user.email}`);
-        console.log(`🔐 Hashed password length: ${user.password ? user.password.length : 'undefined'}`);
 
         // Generate token
         const token = generateToken(user._id);
@@ -164,8 +132,6 @@ router.post('/signup', async (req, res) => {
             avatar: user.avatar,
             bio: user.bio
         };
-
-        console.log('✅ New user registered:', user.email);
 
         res.status(201).json({
             success: true,
