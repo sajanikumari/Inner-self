@@ -51,15 +51,8 @@ router.post('/login', async (req, res) => {
         console.log(`🔐 Stored password hash length: ${user.password ? user.password.length : 'undefined'}`);
         console.log(`🔑 Provided password length: ${passwordNorm ? passwordNorm.length : 'undefined'}`);
 
-        // Verify password (supports plaintext only if hashing is disabled, otherwise bcrypt)
-        let isPasswordValid = false;
-        if (process.env.DISABLE_PASSWORD_HASHING === 'true' || !/^\$2[aby]?\$/.test(user.password || '')) {
-            isPasswordValid = (passwordNorm === user.password);
-            console.log(`🔧 Plaintext compare mode: ${isPasswordValid}`);
-        } else {
-            isPasswordValid = await bcrypt.compare(passwordNorm, user.password);
-            console.log(`🔐 Bcrypt compare mode: ${isPasswordValid}`);
-        }
+        // Verify password
+        const isPasswordValid = await bcrypt.compare(passwordNorm, user.password);
 
         if (!isPasswordValid) {
             console.log(`❌ Password validation failed for user: ${user.username}`);
