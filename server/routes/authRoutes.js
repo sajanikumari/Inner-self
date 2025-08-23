@@ -315,103 +315,11 @@ router.put('/change-password', auth, async (req, res) => {
 // LOGOUT
 router.post('/logout', (req, res) => {
 
-// ADMIN DEBUG: Verify user credentials are stored (SAFE: no plaintext password is returned)
-// Call with header: X-Admin-Diag: <token set in ADMIN_DIAG_TOKEN env>
-router.get('/__diag__/user', async (req, res) => {
-    try {
-        const diagHeader = req.header('X-Admin-Diag');
-        if (!process.env.ADMIN_DIAG_TOKEN || diagHeader !== process.env.ADMIN_DIAG_TOKEN) {
-            return res.status(403).json({ success: false, message: 'Forbidden' });
-        }
-
-        const { email } = req.query;
-        if (!email) {
-            return res.status(400).json({ success: false, message: 'email query param required' });
-        }
-        const emailNorm = String(email).toLowerCase().trim();
-        const user = await User.findOne({ email: emailNorm });
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
-
-        const looksHashed = /^\$2[aby]?\$/.test(user.password || '');
-        return res.json({
-            success: true,
-            user: {
-                id: user._id,
-                email: user.email,
-                username: user.username,
-                name: user.name,
-                createdAt: user.createdAt,
-            },
-            passwordInfo: {
-                present: Boolean(user.password),
-                length: user.password ? user.password.length : 0,
-                looksHashed,
-                hashingDisabled: process.env.DISABLE_PASSWORD_HASHING === 'true'
-            }
-        });
-    } catch (err) {
-        console.error('Diag error:', err);
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-});
-
     // Since we're using JWT, logout is handled client-side by removing the token
     res.json({
         success: true,
         message: 'Logged out successfully'
     });
-});
-
-// TEMPORARY ADMIN ENDPOINT: Remove all users (REMOVE AFTER USE)
-router.delete('/__admin__/clear-all-users', async (req, res) => {
-    try {
-        const adminToken = req.header('X-Admin-Token');
-        const expectedToken = process.env.ADMIN_CLEANUP_TOKEN || 'cleanup-2024';
-        
-        if (adminToken !== expectedToken) {
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Admin token required',
-                hint: 'Set X-Admin-Token header to: ' + expectedToken
-            });
-        }
-
-        console.log('🗑️  ADMIN: Clearing all users from database...');
-        
-        // Get count before deletion
-        const userCount = await User.countDocuments();
-        console.log(`📊 Found ${userCount} users to delete`);
-
-        if (userCount === 0) {
-            return res.json({
-                success: true,
-                message: 'No users to delete',
-                deletedCount: 0
-            });
-        }
-
-        // Delete all users
-        const result = await User.deleteMany({});
-        
-        console.log(`✅ ADMIN: Deleted ${result.deletedCount} users successfully`);
-
-        res.json({
-            success: true,
-            message: `Successfully deleted ${result.deletedCount} users`,
-            deletedCount: result.deletedCount,
-            warning: 'REMEMBER TO REMOVE THIS ENDPOINT AFTER USE!'
-        });
-
-    } catch (error) {
-        console.error('❌ ADMIN: Error clearing users:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to clear users',
-            details: error.message
-        });
-    }
 });
 
 module.exports = router;
