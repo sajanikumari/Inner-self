@@ -8,45 +8,65 @@ const router = express.Router();
 
 // Generate JWT Token
 const generateToken = (userId) => {
-    if (!process.env.JWT_SECRET) {
-        throw new Error('JWT_SECRET is not defined');
-    }
-    return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    return jwt.sign({ userId }, process.env.JWT_SECRET || 'your-secret-key', { expiresIn: '7d' });
 };
 
 // LOGIN - Validate existing users only
 router.post('/login', async (req, res) => {
+    console.log('🚀 LOGIN route hit');
+    console.log('📦 Request body:', req.body);
+
     try {
         const { username, password } = req.body;
         const usernameNorm = (username || '').toLowerCase().trim();
         const passwordNorm = (password || '').trim();
+        console.log(`👤 Username (raw): ${username} -> (norm): ${usernameNorm}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
 
         // Validation
+        console.log('🔍 Validating login fields...');
         if (!usernameNorm || !passwordNorm) {
+            console.log('❌ Missing username or password');
             return res.status(400).json({
                 success: false,
                 message: 'Username and password are required'
             });
         }
+        console.log('✅ Login validation passed');
 
         // Find user in database
+        console.log(`🔍 Looking for user with username: ${usernameNorm}`);
         const user = await User.findOne({ username: usernameNorm });
         if (!user) {
+            console.log(`❌ User not found for username: ${usernameNorm}`);
             return res.status(401).json({
                 success: false,
                 message: 'Invalid username or password'
             });
         }
 
-        // Verify password
-        const isPasswordValid = await bcrypt.compare(passwordNorm, user.password);
+        console.log(`✅ User found: ${user.username}, ID: ${user._id}`);
+        console.log(`🔐 Stored password hash length: ${user.password ? user.password.length : 'undefined'}`);
+        console.log(`🔑 Provided password length: ${passwordNorm ? passwordNorm.length : 'undefined'}`);
+
+        // Verify password (supports plaintext only if hashing is disabled, otherwise bcrypt)
+        let isPasswordValid = false;
+        if (process.env.DISABLE_PASSWORD_HASHING === 'true' || !/^\$2[aby]?\$/.test(user.password || '')) {
+            isPasswordValid = (passwordNorm === user.password);
+            console.log(`🔧 Plaintext compare mode: ${isPasswordValid}`);
+        } else {
+            isPasswordValid = await bcrypt.compare(passwordNorm, user.password);
+            console.log(`🔐 Bcrypt compare mode: ${isPasswordValid}`);
+        }
 
         if (!isPasswordValid) {
+            console.log(`❌ Password validation failed for user: ${user.username}`);
             return res.status(401).json({
                 success: false,
                 message: 'Invalid username or password'
             });
         }
+
+        console.log(`✅ Login successful for user: ${user.username}`);
 
         // Generate token
         const token = generateToken(user._id);
@@ -60,6 +80,8 @@ router.post('/login', async (req, res) => {
             avatar: user.avatar,
             bio: user.bio
         };
+
+        console.log('✅ User logged in successfully:', user.username);
 
         res.json({
             success: true,
@@ -76,16 +98,23 @@ router.post('/login', async (req, res) => {
 
 // SIGNUP - Create new user account
 router.post('/signup', async (req, res) => {
+    console.log('🚀 SIGNUP route hit');
+    console.log('📦 Request body:', req.body);
+
     try {
         const { name, username, email, password } = req.body;
+        console.log(`📧 Email: ${email}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
 
         // Validation
+        console.log('🔍 Validating signup fields...');
         if (!name || !username || !email || !password) {
+            console.log('❌ Missing required fields:', { name: !!name, username: !!username, email: !!email, password: !!password });
             return res.status(400).json({
                 success: false,
                 message: 'All fields are required'
             });
         }
+        console.log('✅ Signup validation passed');
 
         if (password.length < 6) {
             return res.status(400).json({
@@ -111,6 +140,10 @@ router.post('/signup', async (req, res) => {
         }
 
         // Create new user (password will be hashed automatically by the model)
+        console.log(`🔄 Creating new user: ${email.toLowerCase()}`);
+        console.log(`🔑 Original password length: ${password.length}`);
+
+        // Create user with raw password; model pre-save hook will hash it
         const user = new User({
             name: name.trim(),
             username: username.toLowerCase().trim(),
@@ -119,6 +152,9 @@ router.post('/signup', async (req, res) => {
         });
 
         await user.save();
+
+        console.log(`✅ User created successfully: ${user.email}`);
+        console.log(`🔐 Hashed password length: ${user.password ? user.password.length : 'undefined'}`);
 
         // Generate token
         const token = generateToken(user._id);
@@ -132,6 +168,8 @@ router.post('/signup', async (req, res) => {
             avatar: user.avatar,
             bio: user.bio
         };
+
+        console.log('✅ New user registered:', user.email);
 
         res.status(201).json({
             success: true,
@@ -281,11 +319,103 @@ router.put('/change-password', auth, async (req, res) => {
 // LOGOUT
 router.post('/logout', (req, res) => {
 
+// ADMIN DEBUG: Verify user credentials are stored (SAFE: no plaintext password is returned)
+// Call with header: X-Admin-Diag: <token set in ADMIN_DIAG_TOKEN env>
+router.get('/__diag__/user', async (req, res) => {
+    try {
+        const diagHeader = req.header('X-Admin-Diag');
+        if (!process.env.ADMIN_DIAG_TOKEN || diagHeader !== process.env.ADMIN_DIAG_TOKEN) {
+            return res.status(403).json({ success: false, message: 'Forbidden' });
+        }
+
+        const { email } = req.query;
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'email query param required' });
+        }
+        const emailNorm = String(email).toLowerCase().trim();
+        const user = await User.findOne({ email: emailNorm });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const looksHashed = /^\$2[aby]?\$/.test(user.password || '');
+        return res.json({
+            success: true,
+            user: {
+                id: user._id,
+                email: user.email,
+                username: user.username,
+                name: user.name,
+                createdAt: user.createdAt,
+            },
+            passwordInfo: {
+                present: Boolean(user.password),
+                length: user.password ? user.password.length : 0,
+                looksHashed,
+                hashingDisabled: process.env.DISABLE_PASSWORD_HASHING === 'true'
+            }
+        });
+    } catch (err) {
+        console.error('Diag error:', err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
     // Since we're using JWT, logout is handled client-side by removing the token
     res.json({
         success: true,
         message: 'Logged out successfully'
     });
+});
+
+// TEMPORARY ADMIN ENDPOINT: Remove all users (REMOVE AFTER USE)
+router.delete('/__admin__/clear-all-users', async (req, res) => {
+    try {
+        const adminToken = req.header('X-Admin-Token');
+        const expectedToken = process.env.ADMIN_CLEANUP_TOKEN || 'cleanup-2024';
+        
+        if (adminToken !== expectedToken) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Admin token required',
+                hint: 'Set X-Admin-Token header to: ' + expectedToken
+            });
+        }
+
+        console.log('🗑️  ADMIN: Clearing all users from database...');
+        
+        // Get count before deletion
+        const userCount = await User.countDocuments();
+        console.log(`📊 Found ${userCount} users to delete`);
+
+        if (userCount === 0) {
+            return res.json({
+                success: true,
+                message: 'No users to delete',
+                deletedCount: 0
+            });
+        }
+
+        // Delete all users
+        const result = await User.deleteMany({});
+        
+        console.log(`✅ ADMIN: Deleted ${result.deletedCount} users successfully`);
+
+        res.json({
+            success: true,
+            message: `Successfully deleted ${result.deletedCount} users`,
+            deletedCount: result.deletedCount,
+            warning: 'REMEMBER TO REMOVE THIS ENDPOINT AFTER USE!'
+        });
+
+    } catch (error) {
+        console.error('❌ ADMIN: Error clearing users:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to clear users',
+            details: error.message
+        });
+    }
 });
 
 module.exports = router;
