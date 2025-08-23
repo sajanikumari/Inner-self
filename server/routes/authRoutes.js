@@ -17,34 +17,34 @@ router.post('/login', async (req, res) => {
     console.log('📦 Request body:', req.body);
 
     try {
-        const { email, password } = req.body;
-        const emailNorm = (email || '').toLowerCase().trim();
+        const { username, password } = req.body;
+        const usernameNorm = (username || '').toLowerCase().trim();
         const passwordNorm = (password || '').trim();
-        console.log(`📧 Email (raw): ${email} -> (norm): ${emailNorm}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
+        console.log(`👤 Username (raw): ${username} -> (norm): ${usernameNorm}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
 
         // Validation
         console.log('🔍 Validating login fields...');
-        if (!emailNorm || !passwordNorm) {
-            console.log('❌ Missing email or password');
+        if (!usernameNorm || !passwordNorm) {
+            console.log('❌ Missing username or password');
             return res.status(400).json({
                 success: false,
-                message: 'Email and password are required'
+                message: 'Username and password are required'
             });
         }
         console.log('✅ Login validation passed');
 
         // Find user in database
-        console.log(`🔍 Looking for user with email: ${emailNorm}`);
-        const user = await User.findOne({ email: emailNorm });
+        console.log(`🔍 Looking for user with username: ${usernameNorm}`);
+        const user = await User.findOne({ username: usernameNorm });
         if (!user) {
-            console.log(`❌ User not found for email: ${emailNorm}`);
+            console.log(`❌ User not found for username: ${usernameNorm}`);
             return res.status(401).json({
                 success: false,
-                message: 'Invalid email or password'
+                message: 'Invalid username or password'
             });
         }
 
-        console.log(`✅ User found: ${user.email}, ID: ${user._id}`);
+        console.log(`✅ User found: ${user.username}, ID: ${user._id}`);
         console.log(`🔐 Stored password hash length: ${user.password ? user.password.length : 'undefined'}`);
         console.log(`🔑 Provided password length: ${passwordNorm ? passwordNorm.length : 'undefined'}`);
 
@@ -59,14 +59,14 @@ router.post('/login', async (req, res) => {
         }
 
         if (!isPasswordValid) {
-            console.log(`❌ Password validation failed for user: ${user.email}`);
+            console.log(`❌ Password validation failed for user: ${user.username}`);
             return res.status(401).json({
                 success: false,
-                message: 'Invalid email or password'
+                message: 'Invalid username or password'
             });
         }
 
-        console.log(`✅ Login successful for user: ${user.email}`);
+        console.log(`✅ Login successful for user: ${user.username}`);
 
         // Generate token
         const token = generateToken(user._id);
@@ -81,7 +81,7 @@ router.post('/login', async (req, res) => {
             bio: user.bio
         };
 
-        console.log('✅ User logged in successfully:', user.email);
+        console.log('✅ User logged in successfully:', user.username);
 
         res.json({
             success: true,
