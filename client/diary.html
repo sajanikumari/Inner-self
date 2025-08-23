@@ -969,6 +969,23 @@
             previewBtn = document.getElementById('preview-btn');
             previewContainer = document.getElementById('preview-container');
 
+        // --- Response normalizers to handle wrapped API responses ---
+        function normalizeEntriesResponse(payload) {
+            // Accept: Array, {data: Array}, {entries: Array}, or any object with array under a common key
+            if (Array.isArray(payload)) return payload;
+            if (payload && Array.isArray(payload.data)) return payload.data;
+            if (payload && Array.isArray(payload.entries)) return payload.entries;
+            return [];
+        }
+
+        function normalizeEntryResponse(payload) {
+            // Accept: Object, {data: Object}, {entry: Object}
+            if (!payload) return null;
+            if (payload.data && typeof payload.data === 'object') return payload.data;
+            if (payload.entry && typeof payload.entry === 'object') return payload.entry;
+            return payload;
+        }
+
         // Load diary entries from backend
         async function loadDiaryEntries() {
             try {
@@ -988,24 +1005,18 @@
                 });
 
                 if (response.ok) {
-                    const backendEntries = await response.json();
-                    
-                    // Check if backendEntries is an array
-                    if (Array.isArray(backendEntries)) {
-                        console.log('✅ Loaded', backendEntries.length, 'diary entries from backend');
+                    const payload = await response.json();
+                    const entriesArray = normalizeEntriesResponse(payload);
+                    console.log('✅ Loaded', entriesArray.length, 'diary entries from backend');
 
-                        // Convert backend format to frontend format
-                        diaryEntries = backendEntries.map(entry => ({
-                            id: entry._id,
-                            content: entry.content,
-                            mood: entry.mood || 'neutral',
-                            date: new Date(entry.createdAt).toLocaleString(),
-                            voiceFileUrl: entry.voiceFileUrl
-                        }));
-                    } else {
-                        console.warn('⚠️ Backend returned non-array data:', backendEntries);
-                        diaryEntries = [];
-                    }
+                    // Convert backend format to frontend format
+                    diaryEntries = entriesArray.map(entry => ({
+                        id: entry._id,
+                        content: entry.content,
+                        mood: entry.mood || 'neutral',
+                        date: new Date(entry.createdAt).toLocaleString(),
+                        voiceFileUrl: entry.voiceFileUrl
+                    }));
 
                     // Update localStorage backup
                     localStorage.setItem('diaryEntries', JSON.stringify(diaryEntries));
@@ -1041,7 +1052,8 @@
                 });
 
                 if (response.ok) {
-                    const savedEntry = await response.json();
+                    const payload = await response.json();
+                    const savedEntry = normalizeEntryResponse(payload);
                     console.log('✅ Diary entry saved to backend');
                     return savedEntry;
                 } else {
