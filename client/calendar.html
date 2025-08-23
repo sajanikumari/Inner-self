@@ -596,6 +596,9 @@
         Made with LOVE | by SAJANI KUMARI 💞🫶🏻
     </footer>
 
+    <!-- Include config.js for API configuration -->
+    <script src="js/config.js"></script>
+
     <script>
         // Authentication check
         function checkAuthentication() {
@@ -713,7 +716,21 @@
                     });
 
                     if (response.ok) {
-                        reminders = await response.json();
+                        const backendReminders = await response.json();
+                        console.log('🔍 Backend response:', backendReminders);
+                        
+                        // Handle different response formats
+                        if (Array.isArray(backendReminders)) {
+                            reminders = backendReminders;
+                        } else if (backendReminders && Array.isArray(backendReminders.reminders)) {
+                            reminders = backendReminders.reminders;
+                        } else if (backendReminders && backendReminders.data && Array.isArray(backendReminders.data)) {
+                            reminders = backendReminders.data;
+                        } else {
+                            console.warn('⚠️ Unexpected backend response format:', backendReminders);
+                            reminders = [];
+                        }
+                        
                         console.log('✅ Loaded', reminders.length, 'reminders from backend');
 
                         // Update localStorage backup

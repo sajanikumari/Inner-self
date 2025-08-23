@@ -815,7 +815,7 @@
             <a href="index.html"><i class="fas fa-home"></i> Home</a>
             <a href="diary.html" class="active"><i class="fas fa-book"></i> Diary</a>
             <a href="reminders.html"><i class="fas fa-bell"></i> Reminders</a>
-            <a href="calender.html"><i class="fas fa-calendar"></i> Calendar</a>
+            <a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a>
             <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
             <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
@@ -927,6 +927,9 @@
         </div>
     </div>
 
+    <!-- Include config.js for API configuration -->
+    <script src="js/config.js"></script>
+
     <script>
         // Authentication check
         function checkAuthentication() {
@@ -987,10 +990,25 @@
 
                 if (response.ok) {
                     const backendEntries = await response.json();
-                    console.log('✅ Loaded', backendEntries.length, 'diary entries from backend');
+                    console.log('🔍 Backend response:', backendEntries);
+                    
+                    // Handle different response formats
+                    let entriesArray;
+                    if (Array.isArray(backendEntries)) {
+                        entriesArray = backendEntries;
+                    } else if (backendEntries && Array.isArray(backendEntries.entries)) {
+                        entriesArray = backendEntries.entries;
+                    } else if (backendEntries && backendEntries.data && Array.isArray(backendEntries.data)) {
+                        entriesArray = backendEntries.data;
+                    } else {
+                        console.warn('⚠️ Unexpected backend response format:', backendEntries);
+                        entriesArray = [];
+                    }
+                    
+                    console.log('✅ Loaded', entriesArray.length, 'diary entries from backend');
 
                     // Convert backend format to frontend format
-                    diaryEntries = backendEntries.map(entry => ({
+                    diaryEntries = entriesArray.map(entry => ({
                         id: entry._id,
                         content: entry.content,
                         mood: entry.mood || 'neutral',

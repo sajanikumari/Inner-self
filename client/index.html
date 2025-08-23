@@ -1624,24 +1624,8 @@
     <!-- Bust cache to ensure latest config is loaded on GitHub Pages -->
     <script src="js/config.js?v=20250822"></script>
     <script>
-        // Define the getApiUrl helper function
-        function getApiUrl(endpoint) {
-            console.log('🔗 Getting API URL for endpoint:', endpoint);
-            // Force production backend to avoid localhost usage in deployed site
-            const FORCED_BASE = 'https://inner-self-backend.onrender.com/api';
-            try {
-                const baseFromConfig = (typeof API_CONFIG !== 'undefined' && API_CONFIG && API_CONFIG.BASE_URL) ? API_CONFIG.BASE_URL : FORCED_BASE;
-                const finalBase = FORCED_BASE; // enforce production base explicitly
-                const fullUrl = finalBase + endpoint;
-                console.log('📍 BASE (config):', baseFromConfig);
-                console.log('📍 BASE (forced):', finalBase);
-                console.log('📍 Full API URL:', fullUrl);
-                return fullUrl;
-            } catch (err) {
-                console.error('⚠️ Error building API URL:', err);
-                return FORCED_BASE + endpoint;
-            }
-        }
+        // Use the getApiUrl function from config.js instead of defining inline
+        // This ensures consistent API URL logic across all pages
         // DOM elements
         const landingPage = document.getElementById('landing-page');
         const appPage = document.getElementById('app-page');
@@ -1984,7 +1968,7 @@ async function signup() {
                 'home': 'index.html',
                 'diary': 'diary.html',
                 'reminders': 'reminders.html',
-                'calendar': 'calender.html', // Note: keeping the original filename
+                'calendar': 'calendar.html', // Fixed: corrected spelling
                 'settings': 'settings.html'
             };
 
@@ -2014,7 +1998,7 @@ async function signup() {
                 'index.html': 'home',
                 'diary.html': 'diary',
                 'reminders.html': 'reminders',
-                'calender.html': 'calendar',
+                'calendar.html': 'calendar',
                 'settings.html': 'settings'
             };
 
@@ -2059,10 +2043,25 @@ async function signup() {
 
                     if (response.ok) {
                         const backendTasks = await response.json();
-                        console.log('✅ Loaded', backendTasks.length, 'tasks from backend');
+                        console.log('🔍 Backend response:', backendTasks);
+                        
+                        // Handle different response formats
+                        let tasksArray;
+                        if (Array.isArray(backendTasks)) {
+                            tasksArray = backendTasks;
+                        } else if (backendTasks && Array.isArray(backendTasks.tasks)) {
+                            tasksArray = backendTasks.tasks;
+                        } else if (backendTasks && backendTasks.data && Array.isArray(backendTasks.data)) {
+                            tasksArray = backendTasks.data;
+                        } else {
+                            console.warn('⚠️ Unexpected backend response format:', backendTasks);
+                            tasksArray = [];
+                        }
+                        
+                        console.log('✅ Loaded', tasksArray.length, 'tasks from backend');
 
                         // Convert backend format to frontend format
-                        const tasks = backendTasks.map(task => ({
+                        const tasks = tasksArray.map(task => ({
                             id: task._id,
                             text: task.text,
                             time: task.time,
