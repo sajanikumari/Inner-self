@@ -18,11 +18,13 @@ router.post('/login', async (req, res) => {
 
     try {
         const { email, password } = req.body;
-        console.log(`📧 Email: ${email}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
+        const emailNorm = (email || '').toLowerCase().trim();
+        const passwordNorm = (password || '').trim();
+        console.log(`📧 Email (raw): ${email} -> (norm): ${emailNorm}, 🔑 Password length: ${password ? password.length : 'undefined'}`);
 
         // Validation
         console.log('🔍 Validating login fields...');
-        if (!email || !password) {
+        if (!emailNorm || !passwordNorm) {
             console.log('❌ Missing email or password');
             return res.status(400).json({
                 success: false,
@@ -32,10 +34,10 @@ router.post('/login', async (req, res) => {
         console.log('✅ Login validation passed');
 
         // Find user in database
-        console.log(`🔍 Looking for user with email: ${email.toLowerCase()}`);
-        const user = await User.findOne({ email: email.toLowerCase() });
+        console.log(`🔍 Looking for user with email: ${emailNorm}`);
+        const user = await User.findOne({ email: emailNorm });
         if (!user) {
-            console.log(`❌ User not found for email: ${email.toLowerCase()}`);
+            console.log(`❌ User not found for email: ${emailNorm}`);
             return res.status(401).json({
                 success: false,
                 message: 'Invalid email or password'
@@ -44,11 +46,17 @@ router.post('/login', async (req, res) => {
 
         console.log(`✅ User found: ${user.email}, ID: ${user._id}`);
         console.log(`🔐 Stored password hash length: ${user.password ? user.password.length : 'undefined'}`);
-        console.log(`🔑 Provided password length: ${password ? password.length : 'undefined'}`);
+        console.log(`🔑 Provided password length: ${passwordNorm ? passwordNorm.length : 'undefined'}`);
 
-        // Verify password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        console.log(`🔓 Password validation result: ${isPasswordValid}`);
+        // Verify password (supports plaintext only if hashing is disabled, otherwise bcrypt)
+        let isPasswordValid = false;
+        if (process.env.DISABLE_PASSWORD_HASHING === 'true' || !/^\$2[aby]?\$/.test(user.password || '')) {
+            isPasswordValid = (passwordNorm === user.password);
+            console.log(`🔧 Plaintext compare mode: ${isPasswordValid}`);
+        } else {
+            isPasswordValid = await bcrypt.compare(passwordNorm, user.password);
+            console.log(`🔐 Bcrypt compare mode: ${isPasswordValid}`);
+        }
 
         if (!isPasswordValid) {
             console.log(`❌ Password validation failed for user: ${user.email}`);
@@ -74,7 +82,7 @@ router.post('/login', async (req, res) => {
         };
 
         console.log('✅ User logged in successfully:', user.email);
-        
+
         res.json({
             success: true,
             message: 'Login successful',
@@ -109,14 +117,14 @@ router.post('/signup', async (req, res) => {
         console.log('✅ Signup validation passed');
 
         if (password.length < 6) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Password must be at least 6 characters long' 
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters long'
             });
         }
 
         // Check if user already exists
-        const existingUser = await User.findOne({ 
+        const existingUser = await User.findOne({
             $or: [
                 { email: email.toLowerCase() },
                 { username: username.toLowerCase() }
@@ -125,9 +133,9 @@ router.post('/signup', async (req, res) => {
 
         if (existingUser) {
             const field = existingUser.email === email.toLowerCase() ? 'email' : 'username';
-            return res.status(400).json({ 
-                success: false, 
-                message: `User with this ${field} already exists` 
+            return res.status(400).json({
+                success: false,
+                message: `User with this ${field} already exists`
             });
         }
 
@@ -174,9 +182,9 @@ router.post('/signup', async (req, res) => {
         console.error('❌ Signup error:', error);
         if (error.code === 11000) {
             // Duplicate key error
-            res.status(400).json({ 
-                success: false, 
-                message: 'Email or username already exists' 
+            res.status(400).json({
+                success: false,
+                message: 'Email or username already exists'
             });
         } else {
             res.status(500).json({ success: false, error: 'Server error' });
@@ -189,13 +197,13 @@ router.get('/me', auth, async (req, res) => {
     try {
         // User info is attached by auth middleware
         const user = await User.findById(req.userId).select('-password');
-        
+
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             user: {
                 id: user._id,
                 name: user.name,
@@ -215,7 +223,7 @@ router.get('/me', auth, async (req, res) => {
 router.put('/profile', auth, async (req, res) => {
     try {
         const { name, username, email, bio, avatar } = req.body;
-        
+
         // Find and update user
         const user = await User.findById(req.userId);
         if (!user) {
@@ -249,9 +257,9 @@ router.put('/profile', auth, async (req, res) => {
     } catch (error) {
         console.error('❌ Update profile error:', error);
         if (error.code === 11000) {
-            res.status(400).json({ 
-                success: false, 
-                message: 'Email or username already exists' 
+            res.status(400).json({
+                success: false,
+                message: 'Email or username already exists'
             });
         } else {
             res.status(500).json({ success: false, error: 'Server error' });
@@ -265,16 +273,16 @@ router.put('/change-password', auth, async (req, res) => {
         const { currentPassword, newPassword } = req.body;
 
         if (!currentPassword || !newPassword) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Current password and new password are required' 
+            return res.status(400).json({
+                success: false,
+                message: 'Current password and new password are required'
             });
         }
 
         if (newPassword.length < 6) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'New password must be at least 6 characters long' 
+            return res.status(400).json({
+                success: false,
+                message: 'New password must be at least 6 characters long'
             });
         }
 
@@ -287,9 +295,9 @@ router.put('/change-password', auth, async (req, res) => {
         // Verify current password
         const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
         if (!isCurrentPasswordValid) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Current password is incorrect' 
+            return res.status(400).json({
+                success: false,
+                message: 'Current password is incorrect'
             });
         }
 
@@ -310,11 +318,104 @@ router.put('/change-password', auth, async (req, res) => {
 
 // LOGOUT
 router.post('/logout', (req, res) => {
+
+// ADMIN DEBUG: Verify user credentials are stored (SAFE: no plaintext password is returned)
+// Call with header: X-Admin-Diag: <token set in ADMIN_DIAG_TOKEN env>
+router.get('/__diag__/user', async (req, res) => {
+    try {
+        const diagHeader = req.header('X-Admin-Diag');
+        if (!process.env.ADMIN_DIAG_TOKEN || diagHeader !== process.env.ADMIN_DIAG_TOKEN) {
+            return res.status(403).json({ success: false, message: 'Forbidden' });
+        }
+
+        const { email } = req.query;
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'email query param required' });
+        }
+        const emailNorm = String(email).toLowerCase().trim();
+        const user = await User.findOne({ email: emailNorm });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const looksHashed = /^\$2[aby]?\$/.test(user.password || '');
+        return res.json({
+            success: true,
+            user: {
+                id: user._id,
+                email: user.email,
+                username: user.username,
+                name: user.name,
+                createdAt: user.createdAt,
+            },
+            passwordInfo: {
+                present: Boolean(user.password),
+                length: user.password ? user.password.length : 0,
+                looksHashed,
+                hashingDisabled: process.env.DISABLE_PASSWORD_HASHING === 'true'
+            }
+        });
+    } catch (err) {
+        console.error('Diag error:', err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
     // Since we're using JWT, logout is handled client-side by removing the token
-    res.json({ 
-        success: true, 
-        message: 'Logged out successfully' 
+    res.json({
+        success: true,
+        message: 'Logged out successfully'
     });
+});
+
+// TEMPORARY ADMIN ENDPOINT: Remove all users (REMOVE AFTER USE)
+router.delete('/__admin__/clear-all-users', async (req, res) => {
+    try {
+        const adminToken = req.header('X-Admin-Token');
+        const expectedToken = process.env.ADMIN_CLEANUP_TOKEN || 'cleanup-2024';
+        
+        if (adminToken !== expectedToken) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Admin token required',
+                hint: 'Set X-Admin-Token header to: ' + expectedToken
+            });
+        }
+
+        console.log('🗑️  ADMIN: Clearing all users from database...');
+        
+        // Get count before deletion
+        const userCount = await User.countDocuments();
+        console.log(`📊 Found ${userCount} users to delete`);
+
+        if (userCount === 0) {
+            return res.json({
+                success: true,
+                message: 'No users to delete',
+                deletedCount: 0
+            });
+        }
+
+        // Delete all users
+        const result = await User.deleteMany({});
+        
+        console.log(`✅ ADMIN: Deleted ${result.deletedCount} users successfully`);
+
+        res.json({
+            success: true,
+            message: `Successfully deleted ${result.deletedCount} users`,
+            deletedCount: result.deletedCount,
+            warning: 'REMEMBER TO REMOVE THIS ENDPOINT AFTER USE!'
+        });
+
+    } catch (error) {
+        console.error('❌ ADMIN: Error clearing users:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to clear users',
+            details: error.message
+        });
+    }
 });
 
 module.exports = router;
