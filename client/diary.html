@@ -803,7 +803,6 @@
         }
     </style>
 
-    <script src="js/config.js"></script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -816,7 +815,7 @@
             <a href="index.html"><i class="fas fa-home"></i> Home</a>
             <a href="diary.html" class="active"><i class="fas fa-book"></i> Diary</a>
             <a href="reminders.html"><i class="fas fa-bell"></i> Reminders</a>
-            <a href="calender.html"><i class="fas fa-calendar"></i> Calendar</a>
+            <a href="calendar.html"><i class="fas fa-calendar"></i> Calendar</a>
             <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
             <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
@@ -979,7 +978,7 @@
                     return;
                 }
 
-                const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.DIARY), {
+                const response = await fetch('http://localhost:5000/api/diary', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -987,28 +986,26 @@
                 });
 
                 if (response.ok) {
-                    const responseData = await response.json();
+                    const backendEntries = await response.json();
                     
-                    // Check if the response is successful and contains an array of data
-                    if (responseData.success && Array.isArray(responseData.data)) {
-                        const backendEntries = responseData.data;
+                    // Check if backendEntries is an array
+                    if (Array.isArray(backendEntries)) {
                         console.log('✅ Loaded', backendEntries.length, 'diary entries from backend');
 
                         // Convert backend format to frontend format
                         diaryEntries = backendEntries.map(entry => ({
-                            id: entry._id, // For local consistency
-                            _id: entry._id, // Ensure original _id is preserved for API calls
+                            id: entry._id,
                             content: entry.content,
                             mood: entry.mood || 'neutral',
                             date: new Date(entry.createdAt).toLocaleString(),
                             voiceFileUrl: entry.voiceFileUrl
                         }));
                     } else {
-                        console.warn('⚠️ Backend returned non-array or unsuccessful data:', responseData);
+                        console.warn('⚠️ Backend returned non-array data:', backendEntries);
                         diaryEntries = [];
                     }
 
-                    // Update localStorage backup with the corrected data structure
+                    // Update localStorage backup
                     localStorage.setItem('diaryEntries', JSON.stringify(diaryEntries));
                     renderEntries();
                 } else {
@@ -1032,7 +1029,7 @@
                 const token = localStorage.getItem('token');
                 if (!token) throw new Error('No auth token');
 
-                const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.DIARY), {
+                const response = await fetch('http://localhost:5000/api/diary', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -1042,16 +1039,11 @@
                 });
 
                 if (response.ok) {
-                    const responseData = await response.json();
-                    if (responseData.success && responseData.data) {
-                        console.log('✅ Diary entry saved to backend');
-                        return responseData.data;
-                    } else {
-                        throw new Error(responseData.message || `Unknown error saving entry`);
-                    }
+                    const savedEntry = await response.json();
+                    console.log('✅ Diary entry saved to backend');
+                    return savedEntry;
                 } else {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `Backend error: ${response.status}`);
+                    throw new Error(`Backend error: ${response.status}`);
                 }
             } catch (error) {
                 console.error('❌ Failed to save diary entry to backend:', error);
@@ -1684,54 +1676,37 @@
             const entryData = { content, mood };
 
             try {
+                // Update in backend
                 const token = localStorage.getItem('token');
-                if (!token) {
-                    // Fallback for local-only updates if needed, though less likely for updates
-                    throw new Error("Cannot update without authentication.");
-                }
+                if (token) {
+                    const response = await fetch(`http://localhost:5000/api/diary/${entryId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(entryData)
+                    });
 
-                const response = await fetch(`${getApiUrl(API_CONFIG.ENDPOINTS.DIARY)}/${entryId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(entryData)
-                });
-
-                if (response.ok) {
-                    const responseData = await response.json();
-                    if (responseData.success && responseData.data) {
-                        const updatedEntry = responseData.data;
+                    if (response.ok) {
                         console.log('✅ Entry updated in backend');
-
-                        // Find and update the entry in the local array with the response from the server
-                        const entryIndex = diaryEntries.findIndex(e => e._id === entryId || e.id === entryId);
-                        if (entryIndex !== -1) {
-                            diaryEntries[entryIndex] = {
-                                id: updatedEntry._id,
-                                _id: updatedEntry._id,
-                                content: updatedEntry.content,
-                                mood: updatedEntry.mood,
-                                date: new Date(updatedEntry.updatedAt).toLocaleString() + ' (Updated)',
-                                voiceFileUrl: updatedEntry.voiceFileUrl
-                            };
-                        }
-                        
-                        localStorage.setItem('diaryEntries', JSON.stringify(diaryEntries));
-                        renderEntries();
-                        moodResult.textContent = "Entry updated successfully!";
-                    } else {
-                        throw new Error(responseData.message || "Failed to update entry.");
                     }
-                } else {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `Backend error: ${response.status}`);
                 }
+
+                // Update local array
+                const entryIndex = diaryEntries.findIndex(e => e.id === entryId);
+                if (entryIndex !== -1) {
+                    diaryEntries[entryIndex].content = content;
+                    diaryEntries[entryIndex].mood = mood;
+                    diaryEntries[entryIndex].date = new Date().toLocaleString() + ' (Updated)';
+                }
+
+                localStorage.setItem('diaryEntries', JSON.stringify(diaryEntries));
+                renderEntries();
+
+                moodResult.textContent = "Entry updated successfully!";
             } catch (error) {
-                console.error('❌ Failed to update diary entry:', error);
-                alert(`Update failed: ${error.message}`);
-                // Optionally, revert UI changes or handle the error gracefully
+                throw error;
             }
         }
 
@@ -2052,7 +2027,7 @@
                 // Delete from backend if possible
                 const token = localStorage.getItem('token');
                 if (token) {
-                    const response = await fetch(`${getApiUrl(API_CONFIG.ENDPOINTS.DIARY)}/${actualId}`, {
+                    const response = await fetch(`http://localhost:5000/api/diary/${actualId}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`,
